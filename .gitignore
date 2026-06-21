@@ -13,6 +13,7 @@ env/
 db.sqlite3
 staticfiles/
 media/
+test_db.sqlite3
 
 # OS / editor
 .DS_Store

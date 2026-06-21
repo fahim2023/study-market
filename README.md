@@ -259,6 +259,17 @@ _(Whitenoise for static; media file storage solution TBD — likely Cloudinary, 
 
 ### Automated Testing
 
+All automated tests use Django's built-in testing framework. Tests run against a local SQLite database rather than the production Neon Postgres instance — hosted Postgres connection pooling conflicts with Django's test runner repeatedly creating/destroying a throwaway test database, so `settings.py` routes test runs to SQLite explicitly (see Bug 4 below).
+
+#### accounts app
+
+| Test                                                  | Description                                                             | Result | Screenshot                                                                  |
+| ----------------------------------------------------- | ----------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------- |
+| `test_profile_created_automatically_on_user_creation` | A Profile is created automatically via signal when a new User registers | Pass   | ![](documentation/images/testing/test-accounts-profile-created-pass.png)    |
+| `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                   | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.png) |
+
+### Automated Testing
+
 _(Test tables per app once tests are written.)_
 
 ### Manual Testing
@@ -349,7 +360,48 @@ git push heroku main
 ```
 
 - **Screenshot:** ![Bug 3](documentation/images/bugs/bug-03-static-root.png)
-  _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
+
+### Bug 4 — Test database errors against hosted Postgres (Neon)
+
+- **Issue:** Running `python manage.py test accounts` passed the actual test, but then crashed during teardown with `psycopg2.errors.ObjectInUse: database "test_neondb" is being accessed by other users`. Re-running the command afterwards then failed even earlier with `database "test_neondb" already exists`.
+
+```bash
+Destroying test database for alias 'default'...
+Traceback (most recent call last):
+...
+File "/Users/fahim/Desktop/study_market/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 103, in \_execute
+return self.cursor.execute(sql)
+^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: database "test_neondb" is being accessed by other users
+DETAIL: There is 1 other session using the database.
+
+======================================================================
+
+Got an error creating the test database: database "test_neondb" already exists
+Type 'yes' if you would like to try deleting the test database 'test_neondb', or 'no' to cancel: yes
+Destroying old test database for alias 'default'...
+Got an error recreating the test database: database "test_neondb" is being accessed by other users
+DETAIL: There is 1 other session using the database.
+```
+
+- **Root cause:** Django's test runner creates a throwaway test database and destroys it after the run. Neon's connection pooling keeps a session open against the database in a way that blocks Postgres from dropping it, so the teardown step fails and leaves a stale `test_neondb` behind, which then blocks the next run from creating a fresh one.
+- **Fix:** Routed test runs to a local SQLite database instead of Neon, since hosted Postgres connection pooling isn't well suited to the repeated create/destroy cycle of Django's test runner. The production/development database configuration is untouched — this only applies when the `test` management command is running.
+  **Added to `settings.py`, directly after the `DATABASES` block:**
+
+```python
+# When running tests, use a local SQLite database instead of the
+# Neon Postgres instance. Hosted Postgres connection pooling can hold
+# onto sessions in a way that conflicts with Django's test runner
+# repeatedly creating/destroying a throwaway test database.
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'test_db.sqlite3',
+    }
+```
+
+`test_db.sqlite3` was also added to `.gitignore`, alongside the existing `db.sqlite3` entry.
+_(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
 
