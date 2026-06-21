@@ -285,6 +285,36 @@ _(Chrome / Safari / Firefox × Desktop / Tablet / Mobile.)_
 
 ## Bugs
 
+### Bug 1 — Heroku push rejected: no default language detected
+
+- **Issue:** `git push heroku main` was rejected with "No default language could be detected for this app", even though `requirements.txt` existed in the repository.
+- **Root cause:** Two compounding problems. First, no buildpack had been explicitly set on the Heroku app. Second — and the real culprit — the local git repository's root (`.git` folder) was sitting one level above the actual project folder (`~/Desktop` instead of `~/Desktop/study_market`), so every tracked file was nested under an extra `study_market/` prefix in the repo. Heroku was therefore looking for `requirements.txt` at the repo root and not finding it, since it was actually one directory deeper.
+- **Fix:**
+  1. Explicitly set the buildpack: `heroku buildpacks:set heroku/python`
+  2. Moved the `.git` folder into the correct project directory so the repo root matches the project root: `mv ~/Desktop/.git ~/Desktop/study_market/.git`
+  3. Restaged and committed the resulting path changes so all files (`manage.py`, `requirements.txt`, etc.) sit at the top level of the repository.
+
+```bash
+heroku buildpacks:set heroku/python
+mv ~/Desktop/.git ~/Desktop/study_market/.git
+cd ~/Desktop/study_market
+git add -A
+git commit -m "Fix repository root to match project structure"
+git push origin main
+git push heroku main
+```
+
+---
+
+### Bug 2 — Invalid Python version in runtime.txt
+
+- **Issue:** After fixing Bug 1, the build reached the Python detection step but failed with "Invalid Python version in runtime.txt".
+- **Root cause:** `runtime.txt` is Heroku's older, now-deprecated method for pinning a Python version. Heroku's current buildpack expects a `.python-version` file instead, containing only the major version number (no `python-` prefix, no patch version).
+- **Fix:** Removed `runtime.txt` and replaced it with `.python-version` containing just the major version.
+
+\*\*Before ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.png)
+\*\*After ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.png)
+
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
