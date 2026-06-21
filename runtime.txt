@@ -1,4 +1,0 @@
-python-3.12.8
-git commit -m ""
-git push origin main
-git push heroku main
