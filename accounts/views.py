@@ -2,13 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.contrib import messages
-from django.contrib.auth import login
 from django.shortcuts import redirect, render
-
 from .forms import RegisterForm
-
-
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 
 
