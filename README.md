@@ -401,7 +401,26 @@ if 'test' in sys.argv:
 ```
 
 `test_db.sqlite3` was also added to `.gitignore`, alongside the existing `db.sqlite3` entry.
-_(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
+
+### Bug 5 — Heroku release command failed: missing login_view function
+
+- **Issue:** `git push heroku main` built and deployed successfully, but the automatic `release: python manage.py migrate` step then failed with `AttributeError: module 'accounts.views' has no attribute 'login_view'`, and the release was rejected.
+- **Root cause:** `accounts/urls.py` referenced `views.login_view`, but a custom `login_view` function had not yet been written in `accounts/views.py` at the time of that commit — only the route was added, not the view itself. This passed local testing because the dev server hadn't been restarted to pick up the missing reference, but Heroku's release phase runs `manage.py check` fresh on every deploy, which immediately caught the broken import.
+- **Fix:** Added the missing `login_view` function to `accounts/views.py`, handling both the GET (render empty form) and POST (validate credentials, log in, redirect) cases using Django's built-in `AuthenticationForm`.
+- **Note on safety:** Because the release command failed, Heroku did not switch traffic to the broken release — the previous working version stayed live throughout. This confirmed the value of the `release` phase running checks _before_ a deploy goes live, rather than after.
+
+```bash
+python manage.py check
+python manage.py runserver
+# confirm /accounts/login/ works locally before pushing again
+git add accounts/views.py accounts/urls.py
+git commit -m "Fix missing login_view function"
+git push origin main
+git push heroku main
+```
+
+- **Screenshot:** ![Bug 5](documentation/images/bugs/bug-05-login-view-error.png)
+  _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
 
