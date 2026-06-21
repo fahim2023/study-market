@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from .forms import RegisterForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout as auth_logout
 
 
 def register(request):
@@ -42,3 +43,9 @@ def login_view(request):
         form = AuthenticationForm()
 
     return render(request, "accounts/login.html", {"form": form})
+
+
+def logout_view(request):
+    auth_logout(request)
+    messages.success(request, "You've been logged out.")
+    return redirect("accounts:login")
