@@ -315,7 +315,41 @@ git push heroku main
 \*\*Before ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.png)
 \*\*After ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.png)
 
-_(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
+### Bug 3 — collectstatic failed: STATIC_ROOT not set
+
+- **Issue:** After fixing Bugs 1 and 2, the Heroku build progressed further but then failed during the automatic `python manage.py collectstatic --noinput` step, raising `django.core.exceptions.ImproperlyConfigured: You're using the staticfiles app without having set the STATIC_ROOT setting to a filesystem path.`
+- **Root cause:** `STATIC_ROOT` had never been added to `settings.py`. In development, Django's dev server serves static files automatically and doesn't need this setting, so the omission only surfaced once `DEBUG=False` and Heroku's build pipeline tried to gather all static files into a single deployable folder.
+- **Fix:** Added `STATIC_ROOT` pointing at a `staticfiles` folder, and configured Whitenoise's compressed manifest storage backend so static files are served efficiently in production. Also confirmed `whitenoise.middleware.WhiteNoiseMiddleware` was present in `MIDDLEWARE`, directly after `SecurityMiddleware`.
+  **Before (`settings.py`):**
+
+```python
+STATIC_URL = 'static/'
+```
+
+**After (`settings.py`):**
+
+```python
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+```
+
+```bash
+python manage.py check
+python manage.py collectstatic --noinput
+git add studymarket/settings.py
+git commit -m "Configure STATIC_ROOT and Whitenoise for static file serving"
+git push origin main
+git push heroku main
+```
+
+- **Screenshot:** ![Bug 3](documentation/images/bugs/bug-03-static-root.png)
+  _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
 
