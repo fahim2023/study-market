@@ -1,0 +1,32 @@
+:root {
+  --color-primary: #1a535c;
+  --color-secondary: #f4a261;
+  --color-bg: #f8f9fa;
+  --color-text: #191c1d;
+  --color-border: #c0c8ca;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 40px;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.navbar-brand {
+  color: var(--color-primary) !important;
+}
+
+.btn-primary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.btn-primary:hover {
+  background-color: #e08c43;
+  border-color: #e08c43;
+}
