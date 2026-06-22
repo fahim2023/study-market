@@ -263,10 +263,12 @@ All automated tests use Django's built-in testing framework. Tests run against a
 
 #### accounts app
 
-| Test                                                  | Description                                                             | Result | Screenshot                                                                  |
-| ----------------------------------------------------- | ----------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------- |
-| `test_profile_created_automatically_on_user_creation` | A Profile is created automatically via signal when a new User registers | Pass   | ![](documentation/images/testing/test-accounts-profile-created-pass.png)    |
-| `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                   | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.png) |
+| Test                                                  | Description                                                                    | Result | Screenshot                                                                  |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------- |
+| `test_profile_created_automatically_on_user_creation` | A Profile is created automatically via signal when a new User registers        | Pass   | ![](documentation/images/testing/test-accounts-profile-created-pass.png)    |
+| `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                          | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.png) |
+| `test_subject_slug_auto_generated`                    | Subject slug is auto-generated from the subject name on save                   | Pass   | ![](documentation/images/testing/test-courses-subject-slug-pass.png)        |
+| `test_course_slug_auto_generated`                     | Course slug is auto-generated from subject name, course name and level on save | Pass   | ![](documentation/images/testing/test-courses-course-slug-pass.png)         |
 
 ### Automated Testing
 
