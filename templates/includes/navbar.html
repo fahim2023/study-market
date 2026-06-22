@@ -1,6 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+
+        <!-- Logo + Brand -->
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'documents:browse' %}">
             <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 8L16 2L28 8L16 14L4 8Z" fill="#1a535c"/>
                 <path d="M4 14L16 20L28 14" stroke="#1a535c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -10,17 +12,65 @@
             StudyMarket
         </a>
 
-        <div class="ms-auto">
+        <!-- Mobile toggle -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+
+            <!-- Main nav links -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'browse' %}fw-bold{% endif %}"
+                       href="{% url 'documents:browse' %}">Browse</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Sell</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">My Purchases</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- Search bar -->
+            <form class="d-flex me-3" method="GET" action="{% url 'documents:browse' %}">
+                <div class="input-group">
+                    <input
+                        class="form-control form-control-sm"
+                        type="search"
+                        name="q"
+                        placeholder="Search notes..."
+                        value="{{ request.GET.q }}"
+                        style="min-width: 200px;"
+                    >
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Auth state -->
             {% if user.is_authenticated %}
-                <span class="me-2">Hi, {{ user.username }}</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Hi, {{ user.username }}</span>
                 <form method="POST" action="{% url 'accounts:logout' %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-secondary btn-sm">Log out</button>
                 </form>
+            </div>
             {% else %}
-                <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm me-2">Log in</a>
+            <div class="d-flex gap-2">
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm">Log in</a>
                 <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Register</a>
+            </div>
             {% endif %}
+
         </div>
     </div>
 </nav>

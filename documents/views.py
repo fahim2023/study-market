@@ -9,7 +9,7 @@ from courses.models import Subject
 def browse(request):
     """
     Main browse/homepage view. Lists all published documents,
-    with optional filtering by subject.
+    with optional filtering by subject and keyword search.
     """
     documents = Document.objects.filter(status="published").select_related(
         "course", "course__subject", "seller"
@@ -22,10 +22,16 @@ def browse(request):
     if subject_slug:
         documents = documents.filter(course__subject__slug=subject_slug)
 
+    # Search by title keyword
+    query = request.GET.get("q")
+    if query:
+        documents = documents.filter(title__icontains=query)
+
     context = {
         "documents": documents,
         "subjects": subjects,
         "selected_subject": subject_slug,
+        "query": query,
     }
     return render(request, "documents/browse.html", context)
 
