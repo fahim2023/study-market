@@ -455,6 +455,39 @@ git push heroku main
 - **Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.png)
 - **After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.png)
 
+### Bug 7 — InvalidStorageError: missing 'default' key in STORAGES
+
+- **Issue:** Attempting to save a `Document` with a file upload in Django admin crashed with `django.core.files.storage.handler.InvalidStorageError: Could not find config for 'default' in settings.STORAGES`.
+- **Root cause:** The `STORAGES` setting in `settings.py` only defined the `staticfiles` backend (for Whitenoise), but Django's `FileField` on the `Document` model also requires a `default` backend to know where to store uploaded media files. Without it, any attempt to save a file upload crashes immediately.
+- **Note:** This was also the likely root cause of the unexplained 500 error on `/accounts/login/` in production — the missing `default` storage key would crash any page rendering a file field, even just displaying a form.
+- **Fix:** Added the `default` key to `STORAGES` and confirmed `MEDIA_URL` and `MEDIA_ROOT` were set correctly.
+
+**Before (`settings.py`):**
+
+```python
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+```
+
+**After (`settings.py`):**
+
+```python
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+```
+
+- **Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.png)
+- **After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.png)
+
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
