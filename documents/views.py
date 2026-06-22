@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
 from .models import Document
 from courses.models import Subject
 
@@ -27,3 +28,22 @@ def browse(request):
         "selected_subject": subject_slug,
     }
     return render(request, "documents/browse.html", context)
+
+
+def document_detail(request, slug):
+    """
+    Document detail page. Shows preview content to everyone.
+    Full content is only shown if the user has purchased this document.
+    The purchase check is the core gating mechanism of StudyMarket.
+    """
+    document = get_object_or_404(Document, slug=slug, status="published")
+
+    # TODO: wire up real purchase check once payments app exists.
+    # has_purchased will always be False until Purchase model is built.
+    has_purchased = False
+
+    context = {
+        "document": document,
+        "has_purchased": has_purchased,
+    }
+    return render(request, "documents/detail.html", context)

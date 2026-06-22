@@ -87,7 +87,7 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold">£{{ document.price }}</span>
-                            <a href="#" class="btn btn-primary btn-sm">Buy Now</a>
+                            <a href="{% url 'documents:detail' document.slug %}" class="btn btn-primary btn-sm">Buy Now</a>
                         </div>
                     </div>
                 </div>

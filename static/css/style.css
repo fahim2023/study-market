@@ -149,3 +149,43 @@ h6 {
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-primary);
 }
+/* Document detail locked state */
+.locked-content-card {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.locked-content-card .locked-content-body h2,
+.locked-content-card .locked-content-body p {
+  color: white;
+}
+
+.locked-content-card .text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.lock-icon-badge {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Seller avatar initials */
+.seller-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
