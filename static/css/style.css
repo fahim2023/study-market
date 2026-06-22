@@ -189,3 +189,49 @@ h6 {
   font-size: 14px;
   flex-shrink: 0;
 }
+/* ── Footer ─────────────────────────────────────────────── */
+.site-footer {
+  background-color: #2e3132;
+}
+
+.site-footer__brand {
+  font-weight: 700;
+  color: #f0f1f2;
+  font-size: 16px;
+}
+
+.site-footer__tagline {
+  color: #9c9a92;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.site-footer__heading {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f0f1f2;
+  margin-bottom: 12px;
+}
+
+.site-footer__link {
+  color: #9c9a92;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 2;
+  display: block;
+}
+
+.site-footer__link:hover {
+  color: #ffffff;
+}
+
+.site-footer__divider {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.site-footer__copyright {
+  color: #9c9a92;
+  font-size: 14px;
+}

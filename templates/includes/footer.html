@@ -1,0 +1,67 @@
+<footer class="site-footer mt-auto py-5">
+    <div class="container">
+        <div class="row">
+
+            <!-- Brand column -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <a class="d-flex align-items-center gap-2 text-decoration-none mb-3" href="{% url 'documents:browse' %}">
+                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 8L16 2L28 8L16 14L4 8Z" fill="#9acfda"/>
+                        <path d="M4 14L16 20L28 14" stroke="#9acfda" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 20L16 26L28 20" stroke="#9acfda" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 14V26" stroke="#9acfda" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="site-footer__brand">StudyMarket</span>
+                </a>
+                <p class="site-footer__tagline">
+                    The leading marketplace for student-created study materials.
+                    Empowering learners worldwide.
+                </p>
+            </div>
+
+            <!-- Marketplace links -->
+            <div class="col-6 col-lg-2 mb-4 mb-lg-0">
+                <h3 class="site-footer__heading">Marketplace</h3>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'documents:browse' %}" class="site-footer__link">Browse Notes</a></li>
+                    <li><a href="#" class="site-footer__link">Subjects</a></li>
+                    <li><a href="#" class="site-footer__link">Top Sellers</a></li>
+                </ul>
+            </div>
+
+            <!-- Platform links -->
+            <div class="col-6 col-lg-2 mb-4 mb-lg-0">
+                <h3 class="site-footer__heading">Platform</h3>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="site-footer__link">About Us</a></li>
+                    <li><a href="#" class="site-footer__link">Terms</a></li>
+                    <li><a href="#" class="site-footer__link">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- Support links -->
+            <div class="col-6 col-lg-2 mb-4 mb-lg-0">
+                <h3 class="site-footer__heading">Support</h3>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="site-footer__link">Help Centre</a></li>
+                    <li><a href="#" class="site-footer__link">Contact</a></li>
+                    <li><a href="#" class="site-footer__link">FAQ</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <hr class="site-footer__divider mt-4 mb-3">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <p class="site-footer__copyright mb-2 mb-md-0">
+                &copy; 2026 StudyMarket. All rights reserved.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="#" class="site-footer__link">Terms</a>
+                <a href="#" class="site-footer__link">Privacy</a>
+            </div>
+        </div>
+
+    </div>
+</footer>
