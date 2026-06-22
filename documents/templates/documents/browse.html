@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Study Notes | StudyMarket{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- Sidebar filters -->
+    <div class="col-lg-3 mb-4">
+        <div class="card p-3">
+            <h2 class="h6 fw-bold mb-3">Filters</h2>
+            <p class="text-muted small mb-3">Narrow your search</p>
+
+            <form method="GET">
+                <h3 class="h6 fw-semibold mb-2">Subject</h3>
+                {% for subject in subjects %}
+                <div class="form-check mb-1">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="subject"
+                        id="subject-{{ subject.slug }}"
+                        value="{{ subject.slug }}"
+                        {% if selected_subject == subject.slug %}checked{% endif %}
+                    >
+                    <label class="form-check-label small" for="subject-{{ subject.slug }}">
+                        {{ subject.name }}
+                    </label>
+                </div>
+                {% endfor %}
+
+                {% if selected_subject %}
+                <a href="{% url 'documents:browse' %}" class="small text-muted d-block mt-2">
+                    Clear filter
+                </a>
+                {% endif %}
+
+                <hr>
+
+                <button type="submit" class="btn btn-primary w-100 btn-sm">
+                    Apply Filters
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Document grid -->
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Browse Study Notes</h1>
+                <p class="text-muted mb-0">
+                    Discover top-rated academic resources from verified students.
+                </p>
+            </div>
+        </div>
+
+        {% if documents %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for document in documents %}
+            <div class="col">
+                <div class="card h-100 document-card">
+
+                    <!-- Locked thumbnail -->
+                    <div class="document-thumbnail position-relative">
+                        <div class="locked-overlay d-flex flex-column align-items-center justify-content-center">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="11" width="18" height="11" rx="2" fill="#1a535c"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#1a535c" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="locked-badge mt-2">LOCKED</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Course badge -->
+                        <span class="badge bg-light text-primary border mb-2">
+                            {{ document.course.subject.name }} — {{ document.course.get_level_display }}
+                        </span>
+
+                        <h2 class="h6 fw-bold mb-1">{{ document.title }}</h2>
+                        <p class="text-muted small mb-2">
+                            by {{ document.seller.get_full_name|default:document.seller.username }}
+                        </p>
+
+                        <hr class="my-2">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">£{{ document.price }}</span>
+                            <a href="#" class="btn btn-primary btn-sm">Buy Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">No documents found.</p>
+            {% if selected_subject %}
+            <a href="{% url 'documents:browse' %}" class="btn btn-outline-secondary btn-sm">
+                Clear filter
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

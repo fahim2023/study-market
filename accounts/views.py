@@ -20,8 +20,7 @@ def register(request):
             user = form.save()
             login(request, user)
             messages.success(request, f"Welcome to StudyMarket, {user.username}!")
-            # return redirect("documents:browse")
-            return redirect("admin:index")  # temporary until browse view exists
+            return redirect("documents:browse")
     else:
         form = RegisterForm()
 
@@ -30,7 +29,7 @@ def register(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("admin:index")  # temporary until documents:browse exists
+        return redirect("documents:browse")
 
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -38,7 +37,7 @@ def login_view(request):
             user = form.get_user()
             auth_login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
-            return redirect("admin:index")  # temporary until documents:browse exists
+            return redirect("documents:browse")
     else:
         form = AuthenticationForm()
 
