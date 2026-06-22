@@ -101,3 +101,18 @@ h6 {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(26, 83, 92, 0.15);
 }
+.auth-page {
+  padding-top: var(--spacing-lg);
+}
+
+.auth-logo-badge {
+  width: 56px;
+  height: 56px;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}

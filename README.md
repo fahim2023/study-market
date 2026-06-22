@@ -420,7 +420,40 @@ git push heroku main
 ```
 
 - **Screenshot:** ![Bug 5](documentation/images/bugs/bug-05-login-view-error.png)
-  _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
+
+### Bug 6 — Custom CSS not applying: missing STATICFILES_DIRS
+
+- **Issue:** The site rendered with default Bootstrap colours instead of the custom teal/orange design system palette defined in `static/css/style.css`, even though Bootstrap itself loaded correctly and `style.css` had the right content.
+- **Root cause:** `STATICFILES_DIRS` was missing from `settings.py`. `STATIC_ROOT` only defines where `collectstatic` _outputs_ files for production — it does not tell Django where to _find_ source static files during development. Without `STATICFILES_DIRS` pointing at the project's `static/` folder, Django had no way to locate `style.css` at all, confirmed by `python manage.py findstatic css/style.css` returning "No matching file found."
+- **Fix:** Added `STATICFILES_DIRS = [BASE_DIR / "static"]` to `settings.py`, alongside the existing `STATIC_URL` and `STATIC_ROOT` settings.
+  **Before:**
+
+```python
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+```
+
+**After:**
+
+```python
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+```
+
+```bash
+python manage.py findstatic css/style.css
+python manage.py check
+git add studymarket/settings.py
+git commit -m "Fix missing STATICFILES_DIRS so custom CSS is found"
+git push origin main
+git push heroku main
+```
+
+- **Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.png)
+- **After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.png)
+
+_(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
 
