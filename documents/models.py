@@ -8,6 +8,22 @@ from django.utils.text import slugify
 from courses.models import Course
 
 
+class DocumentTag(models.Model):
+    """
+    A short label that can be applied to many documents
+    (e.g. "Exam Prep", "Summary Notes", "Past Paper").
+    Many-to-many with Document.
+    """
+
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Document(models.Model):
     """
     The core model — a study document listed for sale by a seller.
@@ -45,6 +61,7 @@ class Document(models.Model):
         choices=STATUS_CHOICES,
         default="draft",
     )
+    tags = models.ManyToManyField(DocumentTag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
