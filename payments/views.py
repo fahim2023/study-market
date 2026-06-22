@@ -1,7 +1,7 @@
 import stripe
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
@@ -26,28 +26,11 @@ def checkout(request, document_id):
 
     if request.method == "POST":
         intent = stripe.PaymentIntent.create(
-            amount=int(document.price * 100),  # Stripe uses pence/cents
+            amount=int(document.price * 100),
             currency="gbp",
             metadata={"document_id": document.id, "user_id": request.user.id},
         )
-        return render(
-            request,
-            "payments/checkout.html",
-            {
-                "document": document,
-                "client_secret": intent.client_secret,
-                "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-            },
-        )
-
-    return render(
-        request,
-        "payments/checkout.html",
-        {
-            "document": document,
-            "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-        },
-    )
+    return JsonResponse({"client_secret": intent.client_secret})
 
 
 @login_required
