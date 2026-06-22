@@ -269,6 +269,8 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                          | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.png) |
 | `test_subject_slug_auto_generated`                    | Subject slug is auto-generated from the subject name on save                   | Pass   | ![](documentation/images/testing/test-courses-subject-slug-pass.png)        |
 | `test_course_slug_auto_generated`                     | Course slug is auto-generated from subject name, course name and level on save | Pass   | ![](documentation/images/testing/test-courses-course-slug-pass.png)         |
+| `test_tag_str_returns_name`                           | DocumentTag string representation returns the tag name                         | Pass   | ![](documentation/images/testing/test-documents-tag-str-pass.png)           |
+| `test_document_slug_auto_generated`                   | Document slug is auto-generated from the title on save                         | Pass   | ![](documentation/images/testing/test-documents-slug-pass.png)              |
 
 ### Automated Testing
 
