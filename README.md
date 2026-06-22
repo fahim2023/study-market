@@ -490,6 +490,30 @@ STORAGES = {
 - **Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.png)
 - **After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.png)
 
+### Bug 8: `{% load static %}` placed before `{% extends %}` in checkout template
+
+**Issue:** `TemplateSyntaxError` at `/payments/checkout/242/` when navigating to the checkout page. Django threw the error: `{% extends "base.html" %} must be the first tag in 'payments/checkout.html'`, preventing the page from rendering entirely.
+
+![Bug 8 before fix](documentation/images/bugs/bug-08-extends-before.png)
+
+**Cause:** When separating the Stripe JavaScript into a static file, `{% load static %}` was added to the top of `checkout.html` on line 1, pushing `{% extends "base.html" %}` down to line 2. Django's template engine requires `{% extends %}` to be the absolute first tag in any template that inherits from a base template — nothing can precede it, including `{% load %}` tags.
+
+**Fix:** Swapped the order so `{% extends "base.html" %}` appears on line 1 and `{% load static %}` appears on line 2. Django processes `{% extends %}` before anything else, so `{% load static %}` works correctly when placed after it.
+
+![Bug 8 after fix](documentation/images/bugs/bug-08-extends-after.png)
+
+### Bug 9: Footer not sticking to bottom of page on short pages
+
+**Issue:** On pages with little content such as the checkout page, the footer floated halfway up the screen leaving a large blank gap below it.
+
+![Bug 9 before fix](documentation/images/bugs/bug-09-footer-before.png)
+
+**Cause:** The `body` element had no minimum height set, so on pages where the content didn't fill the viewport, the footer would render immediately after the content rather than at the bottom of the page.
+
+**Fix:** Added `min-height: 100vh` and `display: flex; flex-direction: column` to the `body` in `style.css`, and `flex: 1` to the `main` element. This forces the main content area to expand and fill all available space, pushing the footer to the bottom regardless of content length.
+
+![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.png)
+
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
