@@ -5,8 +5,10 @@ const successUrl = stripeData.dataset.successUrl;
 const csrfToken = stripeData.dataset.csrfToken;
 
 const stripe = Stripe(publicKey);
-const elements = stripe.elements();
-const card = elements.create("card");
+const elements = stripe.elements({ locale: "en-GB" });
+const card = elements.create("card", {
+  hidePostalCode: true,
+});
 card.mount("#card-element");
 
 card.on("change", function (event) {
@@ -25,7 +27,7 @@ form.addEventListener("submit", async function (e) {
   });
   const data = await response.json();
 
-  const result = await stripe.confirmCardPayment(clientSecret, {
+  const result = await stripe.confirmCardPayment(data.client_secret, {
     payment_method: { card: card },
   });
 
