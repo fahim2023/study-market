@@ -55,3 +55,42 @@ def payment_success(request, document_id):
 def payment_cancel(request, document_id):
     document = get_object_or_404(Document, id=document_id)
     return render(request, "payments/cancel.html", {"document": document})
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+    event = None
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        return HttpResponse(status=400)
+
+    if event.type == "payment_intent.succeeded":
+        intent = event.data.object
+        document_id = intent.metadata.get("document_id")
+        user_id = intent.metadata.get("user_id")
+
+        if document_id and user_id:
+            try:
+                document = Document.objects.get(id=document_id)
+                from django.contrib.auth.models import User
+
+                user = User.objects.get(id=user_id)
+                Purchase.objects.get_or_create(
+                    buyer=user,
+                    document=document,
+                    defaults={
+                        "stripe_payment_intent": intent.id,
+                        "amount_paid": document.price,
+                    },
+                )
+            except (Document.DoesNotExist, User.DoesNotExist):
+                return HttpResponse(status=400)
+
+    return HttpResponse(status=200)
