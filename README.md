@@ -514,6 +514,97 @@ STORAGES = {
 
 ![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.png)
 
+### Bug 10: Checkout page throwing UnboundLocalError and payment not completing
+
+Three related issues prevented the payment flow from working end to end. Each was identified and fixed in sequence.
+
+---
+
+**Issue 1 — UnboundLocalError on GET request**
+
+When navigating to the checkout page, Django threw an `UnboundLocalError: cannot access local variable 'intent' where it is not associated with a value` at `payments/views.py line 33`.
+
+![Bug 10 before - UnboundLocalError](documentation/images/bugs/bug-10-unbound-intent-before.png)
+
+**Cause:** The `return JsonResponse` statement had been accidentally placed outside the `if request.method == "POST"` block. On a GET request, `intent` is never created because the Stripe API is only called on POST, so Python raised an error when trying to access `intent.client_secret`.
+
+```python
+# Broken — JsonResponse outside the POST block
+if request.method == "POST":
+    intent = stripe.PaymentIntent.create(...)
+return JsonResponse({"client_secret": intent.client_secret})
+```
+
+**Fix:** Moved `return JsonResponse` inside the POST block and added a `return render` for GET requests so the checkout page renders correctly on first load.
+
+```python
+# Fixed
+if request.method == "POST":
+    intent = stripe.PaymentIntent.create(...)
+    return JsonResponse({"client_secret": intent.client_secret})
+
+return render(request, "payments/checkout.html", {
+    "document": document,
+    "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+})
+```
+
+---
+
+**Issue 2 — Postal code field blocking payment**
+
+After fixing Issue 1, the checkout page rendered correctly but the Stripe card element showed a postal code field that only accepted numeric digits. UK postcodes contain letters so the field could never be completed, blocking payment.
+
+![Bug 10 before - postal code](documentation/images/bugs/bug-10-postal-code-before.png)
+
+**Cause:** Stripe's card element defaults to US postal code format (5 numeric digits). Setting `locale: 'en-GB'` did not resolve the issue.
+
+**Fix:** Added `hidePostalCode: true` to the card element options in `checkout.js` to remove the field entirely, as postal code validation is not required for test payments.
+
+```javascript
+// Before
+const card = elements.create("card");
+
+// After
+const card = elements.create("card", {
+  hidePostalCode: true,
+});
+```
+
+---
+
+**Issue 3 — client_secret not being passed to Stripe**
+
+After fixing Issues 1 and 2, clicking Pay produced no visible response. The browser console showed `IntegrationError: Invalid value for stripe.confirmCardPayment intent secret: value should be a client secret of the form ${id}_secret_${secret}. You specified: .`
+
+![Bug 10 before - console error](documentation/images/bugs/bug-10-client-secret-console-before.png)
+
+The Network tab confirmed the POST request was returning 200 OK with the correct JSON including a valid `client_secret`.
+
+![Bug 10 before - network response](documentation/images/bugs/bug-10-client-secret-network-after.png)
+
+**Cause:** The JS was reading `clientSecret` from the `data-client-secret` HTML attribute set at page load. However this attribute is empty on GET because no PaymentIntent exists until the form is submitted. The `client_secret` was being fetched correctly via POST but the JS was ignoring it and using the empty attribute value instead.
+
+```javascript
+// Broken — using empty data attribute from page load
+const result = await stripe.confirmCardPayment(clientSecret, {
+  payment_method: { card: card },
+});
+```
+
+**Fix:** Changed the JS to use `data.client_secret` from the POST response, which contains the actual PaymentIntent secret returned by the checkout view.
+
+```javascript
+// Fixed — using client_secret from POST response
+const data = await response.json();
+const result = await stripe.confirmCardPayment(data.client_secret, {
+  payment_method: { card: card },
+});
+```
+
+After all three fixes the payment flow completed successfully, the success page rendered, and the Purchase record was confirmed in the database.
+
+![Bug 10 after - payment success](documentation/images/bugs/bug-10-payment-success-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
