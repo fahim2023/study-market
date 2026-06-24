@@ -619,6 +619,31 @@ After all three fixes the payment flow completed successfully, the success page 
 **Cause:** `Course` model uses `name` not `title`. The error was caught by the test runner.
 
 **Fix:** Changed `title='A-Level Maths'` to `name='A-Level Maths'` in `payments/tests.py` setUp.
+
+### Bug 12: Footer missing on deployed Heroku site
+
+**Issue:** The footer was visible locally but completely absent on the live Heroku deployment. Inspecting the page source on Heroku confirmed the footer HTML was not being rendered — after `</main>` the page went straight to the Bootstrap `<script>` tag and `</body>`, with no footer element present.
+
+![Bug 12 before fix](documentation/images/bugs/bug-12-footer-missing-before.png)
+
+**Cause:** The `{% include 'includes/footer.html' %}` line had been added to `templates/base.html` locally but was never staged and committed to git. Because Heroku deploys from the git repository rather than the local file system, it was running with the older version of `base.html` that had no footer include. The file looked correct locally because the working directory had the change, but `git show HEAD:templates/base.html` confirmed the committed version did not contain the footer include line.
+
+```bash
+# Confirmed footer include was missing from committed base.html
+git show HEAD:templates/base.html | grep footer
+# returned nothing
+```
+
+**Fix:** Staged and committed `templates/base.html` with the footer include in place, then pushed to both GitHub and Heroku.
+
+```html
+<!-- Added to base.html before the closing </body> tag -->
+{% include 'includes/footer.html' %}
+```
+
+After deploying, the footer rendered correctly on the live site.
+
+![Bug 12 after fix](documentation/images/bugs/bug-12-footer-missing-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
