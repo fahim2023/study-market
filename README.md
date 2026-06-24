@@ -272,6 +272,14 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_tag_str_returns_name`                           | DocumentTag string representation returns the tag name                         | Pass   | ![](documentation/images/testing/test-documents-tag-str-pass.png)           |
 | `test_document_slug_auto_generated`                   | Document slug is auto-generated from the title on save                         | Pass   | ![](documentation/images/testing/test-documents-slug-pass.png)              |
 
+## Payments App Testing
+
+| Test                                | Description                                                                                                                       | Result  | Screenshot                                             |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------ |
+| `test_purchase_str`                 | Purchase `__str__` returns correct format `buyer → document title`                                                                | ✅ Pass | ![](documentation/images/testing/payments-test-01.png) |
+| `test_duplicate_purchase_prevented` | Attempting to create a duplicate Purchase for the same buyer and document raises an exception due to `unique_together` constraint | ✅ Pass | ![](documentation/images/testing/payments-test-02.png) |
+| `test_checkout_requires_login`      | Unauthenticated users attempting to access the checkout page are redirected to the login page with a 302 response                 | ✅ Pass | ![](documentation/images/testing/payments-test-03.png) |
+
 ### Automated Testing
 
 _(Test tables per app once tests are written.)_
@@ -605,6 +613,12 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 After all three fixes the payment flow completed successfully, the success page rendered, and the Purchase record was confirmed in the database.
 
 ![Bug 10 after - payment success](documentation/images/bugs/bug-10-payment-success-after.png)
+
+### Bug 11: Incorrect field name `title` used in payments test setUp
+
+**Cause:** `Course` model uses `name` not `title`. The error was caught by the test runner.
+
+**Fix:** Changed `title='A-Level Maths'` to `name='A-Level Maths'` in `payments/tests.py` setUp.
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
