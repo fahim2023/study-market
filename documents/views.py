@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Document
 from courses.models import Subject
 from payments.models import Purchase
+from reviews.models import Review
 
 
 def browse(request):
@@ -45,8 +46,6 @@ def document_detail(request, slug):
         request.user.is_authenticated
         and Purchase.objects.filter(buyer=request.user, document=document).exists()
     )
-
-    from reviews.models import Review
 
     reviews = Review.objects.filter(document=document).select_related("reviewer")
 
