@@ -280,6 +280,14 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_duplicate_purchase_prevented` | Attempting to create a duplicate Purchase for the same buyer and document raises an exception due to `unique_together` constraint | ✅ Pass | ![](documentation/images/testing/payments-test-02.png) |
 | `test_checkout_requires_login`      | Unauthenticated users attempting to access the checkout page are redirected to the login page with a 302 response                 | ✅ Pass | ![](documentation/images/testing/payments-test-03.png) |
 
+## Reviews App Testing
+
+| Test                                  | Description                                                                                              | Result  | Screenshot                                            |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------- |
+| `test_review_str`                     | Review `__str__` returns correct format `reviewer — document title (rating★)`                            | ✅ Pass | ![](documentation/images/testing/reviews-test-01.png) |
+| `test_unpurchased_user_cannot_review` | A user who has not purchased a document is redirected away from the review form and no review is created | ✅ Pass | ![](documentation/images/testing/reviews-test-02.png) |
+| `test_purchased_user_can_review`      | A user who has purchased a document can successfully submit a review which is saved to the database      | ✅ Pass | ![](documentation/images/testing/reviews-test-03.png) |
+
 ### Automated Testing
 
 _(Test tables per app once tests are written.)_
