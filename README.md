@@ -712,6 +712,34 @@ After deploying, the document detail page loaded correctly on the live site.
 **Prevention:** Always run `git status` before pushing to confirm no local changes have been left uncommitted. Each feature should be committed in its entirety before moving on.
 
 ![Bug 14 after fix](documentation/images/bugs/bug-14-heroku-500-after.png)
+
+### Bug 15: Stripe publishable key not set on Heroku causing payments to fail
+
+**Issue:** On the live Heroku site, clicking the "Unlock" button to purchase a document produced no visible response — the checkout page loaded correctly with the card element, but pressing Pay did nothing. Opening the browser developer console revealed the error: `Uncaught IntegrationError: Please call Stripe() with your publishable key. You used an empty string.`
+
+![Bug 15 before fix](documentation/images/bugs/bug-15-stripe-public-key-before.png)
+
+**Cause:** The `STRIPE_PUBLIC_KEY` environment variable had not been configured in Heroku's config vars. Locally, all environment variables are loaded from `env.py` at runtime. However `env.py` is listed in `.gitignore` and is never committed to the repository or deployed to Heroku — this is intentional for security reasons, as it contains secret keys. Without the variable being explicitly set in Heroku's config vars, `os.environ.get('STRIPE_PUBLIC_KEY', '')` in `settings.py` returned an empty string. This empty string was passed through the Django template context into the `data-public-key` attribute on the `div#stripe-data` element, which `checkout.js` then read and passed to `Stripe()` — causing Stripe's JS library to throw the integration error and refuse to initialise.
+
+The issue only appeared on Heroku and not locally because the local `env.py` had the key correctly set. This is a common deployment gotcha with environment-variable-based configuration — every variable in `env.py` must also be manually set in Heroku's config vars.
+
+During the fix, the Stripe secret key (`sk_test_...`) was accidentally entered as the value for `STRIPE_PUBLIC_KEY` instead of the publishable key (`pk_test_...`). This was caught immediately and corrected — the two keys serve different purposes: the publishable key is safe to expose in the frontend JS, while the secret key must never leave the server.
+
+**Fix:** Set the correct Stripe publishable key in Heroku config vars using the CLI:
+
+```bash
+heroku config:set STRIPE_PUBLIC_KEY=pk_test_...
+```
+
+The value was confirmed with:
+
+```bash
+heroku config:get STRIPE_PUBLIC_KEY
+```
+
+After the dyno restarted with the correct key, the Stripe card element initialised correctly, the payment flow completed successfully, and the success page rendered on the live site.
+
+![Bug 15 after fix](documentation/images/bugs/bug-15-stripe-public-key-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
