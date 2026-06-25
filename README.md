@@ -644,6 +644,36 @@ git show HEAD:templates/base.html | grep footer
 After deploying, the footer rendered correctly on the live site.
 
 ![Bug 12 after fix](documentation/images/bugs/bug-12-footer-missing-after.png)
+
+### Bug 13: Reviews section missing from document detail page
+
+**Issue:** After deleting a review, the reviews section disappeared entirely from the document detail page — including the "Write a Review" button, meaning there was no way to add a new review.
+
+![Bug 13 before fix](documentation/images/bugs/bug-13-reviews-section-missing-before.png)
+
+**Cause:** When the detail template was rewritten to wire up the checkout buttons, the reviews section lost its wrapping `<div class="card p-4 mb-4">` container and the `{% if has_purchased and not user_has_reviewed %}` block containing the "Write a Review" button. The `{% for review in reviews %}` loop remained but without the card wrapper or the button, leaving the section invisible when there were no reviews to iterate over.
+
+**Fix:** Rewrote the reviews section with the correct structure — a card wrapper containing the reviews loop, a fallback "No reviews yet" message when the queryset is empty, and the "Write a Review" button rendered conditionally when the user has purchased the document but not yet left a review.
+
+```html
+<div class="card p-4 mb-4">
+  <h2 class="h5 fw-bold mb-3">Reviews</h2>
+  {% if reviews %} {% for review in reviews %} ... {% endfor %} {% else %}
+  <p class="text-muted mb-3">
+    No reviews yet. Be the first to review this document.
+  </p>
+  {% endif %} {% if has_purchased and not user_has_reviewed %}
+  <a
+    href="{% url 'reviews:add_review' document.id %}"
+    class="btn btn-outline-secondary mt-2"
+  >
+    Write a Review
+  </a>
+  {% endif %}
+</div>
+```
+
+![Bug 13 after fix](documentation/images/bugs/bug-13-reviews-section-missing-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
