@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "documents",
     "payments",
     "reviews",
+    "home",
 ]
 
 STORAGES = {

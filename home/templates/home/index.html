@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}StudyMarket — Exam-Ready Notes from Students Who've Aced It{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="row align-items-center py-5">
+    <div class="col-lg-6">
+        <h1 class="display-5 fw-bold mb-3">
+            Get exam-ready notes from students who've already aced the course
+        </h1>
+        <p class="lead text-muted mb-4">
+            Browse thousands of revision notes, past-paper solutions and study guides 
+            created by students, for students.
+        </p>
+        <div class="d-flex gap-3">
+            <a href="{% url 'documents:browse' %}" class="btn btn-primary btn-lg">
+                Browse Notes
+            </a>
+            <a href="#how-it-works" class="btn btn-outline-secondary btn-lg">
+                How it works
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-6 d-none d-lg-block text-center">
+        <div class="p-5 rounded-3" style="background-color: var(--color-primary); opacity: 0.08;">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
