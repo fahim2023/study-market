@@ -674,6 +674,36 @@ After deploying, the footer rendered correctly on the live site.
 ```
 
 ![Bug 13 after fix](documentation/images/bugs/bug-13-reviews-section-missing-after.png)
+
+### Bug 14: Heroku 500 error on document detail page after reviews app added
+
+**Issue:** After adding the `reviews` app, the live Heroku site threw a 500 Internal Server Error on all document detail pages while the local development server worked fine.
+
+![Bug 14 before fix](documentation/images/bugs/bug-14-heroku-500-before.png)
+
+**Cause:** Several local changes had never been staged and committed to git, meaning Heroku was deploying an incomplete codebase. The missing changes were:
+
+- `reviews` was added to `INSTALLED_APPS` locally but the updated `settings.py` was never committed, so Heroku did not know the `reviews` app existed. This caused Django to throw `RuntimeError: Model class reviews.models.Review doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS` every time the document detail view tried to import the `Review` model.
+- `payments/views.py` had local changes not committed.
+- `studymarket/urls.py` had the `reviews/` path added locally but not committed.
+- `requirements.txt` had new packages not committed.
+
+The Heroku release command was failing silently on each deploy attempt, leaving the dyno running the previous broken version of the code. This was confirmed by running `heroku releases:output v72` which showed the full traceback.
+
+**Fix:** Ran `git status` which revealed the uncommitted files, then staged and committed all outstanding changes:
+
+```bash
+git add .
+git commit -m "Commit any missed changes"
+git push origin main
+git push heroku main
+```
+
+After deploying, the document detail page loaded correctly on the live site.
+
+**Prevention:** Always run `git status` before pushing to confirm no local changes have been left uncommitted. Each feature should be committed in its entirety before moving on.
+
+![Bug 14 after fix](documentation/images/bugs/bug-14-heroku-500-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
