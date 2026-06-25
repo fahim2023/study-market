@@ -46,8 +46,19 @@ def document_detail(request, slug):
         and Purchase.objects.filter(buyer=request.user, document=document).exists()
     )
 
+    from reviews.models import Review
+
+    reviews = Review.objects.filter(document=document).select_related("reviewer")
+
+    user_has_reviewed = (
+        request.user.is_authenticated
+        and Review.objects.filter(reviewer=request.user, document=document).exists()
+    )
+
     context = {
         "document": document,
         "has_purchased": has_purchased,
+        "reviews": reviews,
+        "user_has_reviewed": user_has_reviewed,
     }
     return render(request, "documents/detail.html", context)
