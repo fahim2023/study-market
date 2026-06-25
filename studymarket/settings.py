@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "courses",
     "documents",
     "payments",
+    "reviews",
 ]
 
 STORAGES = {
