@@ -17,7 +17,6 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def checkout(request, document_id):
     document = get_object_or_404(Document, id=document_id)
 
-    # Prevent buying something you already own
     already_purchased = Purchase.objects.filter(
         buyer=request.user, document=document
     ).exists()
@@ -30,7 +29,16 @@ def checkout(request, document_id):
             currency="gbp",
             metadata={"document_id": document.id, "user_id": request.user.id},
         )
-    return JsonResponse({"client_secret": intent.client_secret})
+        return JsonResponse({"client_secret": intent.client_secret})
+
+    return render(
+        request,
+        "payments/checkout.html",
+        {
+            "document": document,
+            "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+        },
+    )
 
 
 @login_required
