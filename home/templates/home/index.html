@@ -28,5 +28,137 @@
         </div>
     </div>
 </div>
+<!-- Explore by Subject -->
+<div class="py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Explore by Subject</h2>
+        <a href="{% url 'documents:browse' %}" class="text-muted small">View all subjects →</a>
+    </div>
+    <div class="row g-3">
+        {% for subject in subjects %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="{% url 'documents:browse' %}?subject={{ subject.slug }}" 
+               class="card p-3 text-center text-decoration-none d-block">
+                <div class="fw-semibold text-dark">{{ subject.name }}</div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- Featured Revision Guides -->
+<div class="py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Featured Revision Guides</h2>
+        <a href="{% url 'documents:browse' %}" class="text-muted small">View all →</a>
+    </div>
+    <div class="row g-4">
+        {% for document in featured_documents %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 document-card">
+                <div class="document-thumbnail position-relative d-flex align-items-center justify-content-center">
+                    <div class="text-center">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="11" width="18" height="11" rx="2" fill="#1A535C"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#1A535C" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <div class="locked-badge mt-2">LOCKED</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <span class="badge mb-2" style="background-color: var(--color-primary)">
+                        {{ document.course.subject.name }}
+                    </span>
+                    <h3 class="h6 fw-bold mb-1">{{ document.title }}</h3>
+                    <p class="text-muted small mb-3">by {{ document.seller.username }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">£{{ document.price }}</span>
+                        <a href="{% url 'documents:detail' document.slug %}" class="btn btn-primary btn-sm">
+                            Buy Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- How it Works -->
+<div class="py-5" id="how-it-works">
+    <h2 class="fw-bold text-center mb-5">How StudyMarket Works</h2>
+    <div class="row g-4">
+
+        <!-- For Buyers -->
+        <div class="col-md-6">
+            <div class="card p-4 h-100">
+                <h3 class="h5 fw-bold mb-4">For Students Buying</h3>
+                <div class="d-flex mb-3">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">1</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Browse & discover</p>
+                        <p class="text-muted small mb-0">Search by subject, level or keyword to find the notes you need.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">2</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Purchase securely</p>
+                        <p class="text-muted small mb-0">Pay safely via Stripe. Your payment is protected at every step.</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">3</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Download instantly</p>
+                        <p class="text-muted small mb-0">Access your notes immediately after payment and study at your own pace.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For Sellers -->
+        <div class="col-md-6">
+            <div class="card p-4 h-100">
+                <h3 class="h5 fw-bold mb-4">For Students Selling</h3>
+                <div class="d-flex mb-3">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">1</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Upload your notes</p>
+                        <p class="text-muted small mb-0">Share the revision materials you've already created for your own studies.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">2</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Set your price</p>
+                        <p class="text-muted small mb-0">You decide what your notes are worth. Keep full control of your content.</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="fw-bold me-3" style="color: var(--color-primary)">3</div>
+                    <div>
+                        <p class="fw-semibold mb-1">Earn money</p>
+                        <p class="text-muted small mb-0">Get paid every time a student purchases your notes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- CTA Strip -->
+<div class="py-5 text-center rounded-3 mb-5" style="background-color: var(--color-primary)">
+    <h2 class="fw-bold text-white mb-3">Ready to ace your exams?</h2>
+    <p class="text-white mb-4" style="opacity: 0.85;">
+        Join thousands of students buying and selling study materials on StudyMarket.
+    </p>
+    <div class="d-flex gap-3 justify-content-center">
+        <a href="{% url 'documents:browse' %}" class="btn btn-light btn-lg">
+            Get Started Now
+        </a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg">
+            Become a Seller
+        </a>
+    </div>
+</div>
 
 {% endblock %}
