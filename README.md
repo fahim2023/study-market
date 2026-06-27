@@ -789,6 +789,67 @@ STORAGES = {
 After setting the config var and pushing again, the Heroku build succeeded and the application deployed correctly.
 
 ![Bug 16 after fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-after.png)
+
+### Bug 17: NoReverseMatch on seller dashboard — edit and delete URLs not yet registered
+
+**Issue:** After successfully uploading a document via the seller upload form, Django redirected to the seller dashboard at `/documents/seller/dashboard/`. The page immediately threw a `NoReverseMatch` error: `Reverse for 'edit' not found. 'edit' is not a valid view function or pattern name.` The dashboard was completely inaccessible.
+
+![Bug 17 before fix](documentation/images/bugs/bug-17-no-reverse-match-before.png)
+
+**Cause:** The `seller_dashboard.html` template was written in full, including Edit and Delete action buttons for each document row, before the corresponding `edit_document` and `delete_document` views and their URL patterns had been built. Django resolves all `{% url %}` template tags at render time — if any named URL cannot be found in the URL configuration, it raises a `NoReverseMatch` exception immediately, preventing the entire page from rendering. The template contained:
+
+```html
+<a href="{% url 'documents:edit' document.slug %}">Edit</a>
+<a href="{% url 'documents:delete' document.slug %}">Delete</a>
+```
+
+Neither `documents:edit` nor `documents:delete` existed in `documents/urls.py` at the time, causing the crash.
+
+**Fix:** Temporarily removed the Edit and Delete buttons from `seller_dashboard.html`, leaving only the View button which correctly resolves to `documents:detail`. The edit and delete views, URLs and templates are being built as separate subsequent features. This restored the dashboard to a working state immediately.
+
+---
+
+### Bug 18: Upload page returning 404 at incorrect URL path
+
+**Issue:** Attempting to navigate to `http://127.0.0.1:8000/seller/upload/` returned a 404 Page Not Found error. Django listed all registered URL patterns in the debug output and none of them matched `seller/upload/`.
+
+![Bug 18 before fix](documentation/images/bugs/bug-18-upload-404-before.png)
+
+**Cause:** The upload view is registered inside `documents/urls.py`, which is itself included in the project URLs under the `documents/` prefix in `studymarket/urls.py`:
+
+```python
+path("documents/", include("documents.urls")),
+```
+
+This means all document URLs — including the upload page — are prefixed with `documents/`. The correct path is therefore `http://127.0.0.1:8000/documents/seller/upload/`, not `http://127.0.0.1:8000/seller/upload/`. The `documents/` prefix was being omitted when typing the URL directly into the browser.
+
+**Fix:** Used the correct full URL path `http://127.0.0.1:8000/documents/seller/upload/`. All internal links in templates use `{% url 'documents:upload' %}` which Django resolves correctly — this was purely a manual browser navigation error during testing.
+
+---
+
+### Bug 19: Cloudinary rejecting file uploads over 10MB with unhandled BadRequest exception
+
+**Issue:** When attempting to upload a large PDF (57MB) via the seller upload form, Django threw an unhandled `BadRequest` exception with the message: `File size too large. Got 59705814. Maximum is 10485760. Upgrade your plan to enjoy higher limits`. The error page was shown to the user with no helpful feedback.
+
+![Bug 19 before fix](documentation/images/bugs/bug-19-cloudinary-file-size-before.png)
+
+**Cause:** Cloudinary's free plan enforces a 10MB maximum file size per upload. The `DocumentForm` had no file size validation — it accepted any file regardless of size, passed it to Django's file handling pipeline, and only when the file was actually sent to Cloudinary's API did the size limit get enforced. At that point Cloudinary returned an error which Django raised as an unhandled `BadRequest` exception, crashing the view and showing the user the Django debug error page rather than a friendly validation message.
+
+This is poor defensive design — the error should be caught before the file ever reaches Cloudinary, saving both the upload bandwidth and giving the user a clear, actionable message.
+
+**Fix:** Added a `clean_file` method to `DocumentForm` in `documents/forms.py` that checks the file size before the form is considered valid. If the file exceeds 10MB, a `ValidationError` is raised and displayed to the user inline on the form:
+
+```python
+def clean_file(self):
+    file = self.cleaned_data.get('file')
+    if file and file.size > 10 * 1024 * 1024:
+        raise forms.ValidationError(
+            'File size must be under 10MB. Please compress your PDF and try again.'
+        )
+    return file
+```
+
+With this in place, oversized files are rejected at form validation before any Cloudinary API call is made, and the user sees a clear error message on the upload form explaining the limit and what to do.
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
