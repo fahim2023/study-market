@@ -102,3 +102,20 @@ def stripe_webhook(request):
                 return HttpResponse(status=400)
 
     return HttpResponse(status=200)
+
+
+@login_required
+def my_purchases(request):
+    purchases = (
+        Purchase.objects.filter(buyer=request.user)
+        .select_related("document", "document__course", "document__course__subject")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "payments/my_purchases.html",
+        {
+            "purchases": purchases,
+        },
+    )

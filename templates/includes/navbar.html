@@ -2,7 +2,7 @@
     <div class="container">
 
         <!-- Logo + Brand -->
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'documents:browse' %}">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'home:home' %}">
             <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 8L16 2L28 8L16 14L4 8Z" fill="#1a535c"/>
                 <path d="M4 14L16 20L28 14" stroke="#1a535c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -30,7 +30,8 @@
                     <a class="nav-link" href="#">Sell</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">My Purchases</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'my_purchases' %}fw-bold{% endif %}"
+                       href="{% url 'payments:my_purchases' %}">My Purchases</a>
                 </li>
                 {% endif %}
             </ul>
