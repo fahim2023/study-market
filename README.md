@@ -740,6 +740,55 @@ heroku config:get STRIPE_PUBLIC_KEY
 After the dyno restarted with the correct key, the Stripe card element initialised correctly, the payment flow completed successfully, and the success page rendered on the live site.
 
 ![Bug 15 after fix](documentation/images/bugs/bug-15-stripe-public-key-after.png)
+
+### Bug 16: Cloudinary `django-cloudinary-storage` incompatible with Django 5.2 causing Heroku build failure
+
+**Issue:** After installing `cloudinary` and `django-cloudinary-storage` for media file persistence on Heroku, every subsequent deploy failed during the build process. The Heroku build log showed the error occurring during the automatic `python manage.py collectstatic --noinput` step:
+
+```
+AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'. Did you mean: 'STATICFILES_DIRS'?
+Error: Unable to generate Django static files.
+Push rejected, failed to compile Python app.
+```
+
+This meant no new code could be deployed to Heroku until the issue was resolved.
+
+![Bug 16 before fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-before.png)
+
+**Cause:** The `django-cloudinary-storage==0.3.0` package was written for older versions of Django that used `STATICFILES_STORAGE` as a top-level settings key to configure the static files storage backend. In Django 4.2, this key was deprecated in favour of the new `STORAGES` dictionary which consolidates both `DEFAULT_FILE_STORAGE` and `STATICFILES_STORAGE` into a single setting. By Django 5.2, `STATICFILES_STORAGE` was removed entirely from the framework.
+
+The `django-cloudinary-storage` package's overridden `collectstatic` management command still contained a reference to `settings.STATICFILES_STORAGE` on line 27 of its source:
+
+```python
+if (settings.STATICFILES_STORAGE == 'cloudinary_storage.storage.StaticCloudinaryStorage' or
+```
+
+Since `STATICFILES_STORAGE` no longer exists as an attribute on the Django settings object in Django 5.2, Python raised an `AttributeError` every time Heroku ran `collectstatic` during the build, causing the entire build to fail and the push to be rejected.
+
+An initial fix attempt of replacing `DEFAULT_FILE_STORAGE` with the new `STORAGES` dictionary in `settings.py` did not resolve the issue, because the problem was inside the third-party `django-cloudinary-storage` package itself — not in our project's settings. The package would need to be updated by its maintainers to support Django 5.2.
+
+**Fix:** Since Whitenoise already handles static file serving reliably on Heroku, Cloudinary is only needed for user-uploaded media files (PDFs). There was no need for `django-cloudinary-storage` to intercept the `collectstatic` process at all. The fix was to disable Heroku's automatic `collectstatic` call by setting a config var:
+
+```bash
+heroku config:set DISABLE_COLLECTSTATIC=1
+```
+
+Static files continue to be collected locally and served by Whitenoise as before. Cloudinary handles only the media file storage backend via the `STORAGES` setting in `settings.py`:
+
+```python
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+```
+
+After setting the config var and pushing again, the Heroku build succeeded and the application deployed correctly.
+
+![Bug 16 after fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
