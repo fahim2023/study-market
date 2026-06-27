@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Document
 from courses.models import Subject
 from payments.models import Purchase
 from reviews.models import Review
+from .forms import DocumentForm
+from django.contrib import messages
 
 
 def browse(request):
@@ -61,3 +63,44 @@ def document_detail(request, slug):
         "user_has_reviewed": user_has_reviewed,
     }
     return render(request, "documents/detail.html", context)
+
+
+@login_required
+def seller_dashboard(request):
+    """
+    Seller dashboard — shows all documents uploaded by the logged-in user.
+    """
+    documents = Document.objects.filter(seller=request.user).order_by("-created_at")
+
+    return render(
+        request,
+        "documents/seller_dashboard.html",
+        {
+            "documents": documents,
+        },
+    )
+
+
+@login_required
+def upload_document(request):
+    """
+    Allows sellers to upload a new document.
+    """
+    if request.method == "POST":
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            document = form.save(commit=False)
+            document.seller = request.user
+            document.save()
+            messages.success(request, "Your document has been uploaded successfully.")
+            return redirect("documents:seller_dashboard")
+    else:
+        form = DocumentForm()
+
+    return render(
+        request,
+        "documents/upload.html",
+        {
+            "form": form,
+        },
+    )

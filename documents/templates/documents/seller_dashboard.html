@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Dashboard | StudyMarket{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold mb-0">Seller Dashboard</h1>
+            <a href="{% url 'documents:upload' %}" class="btn btn-primary">
+                + Upload Notes
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if documents %}
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Uploaded</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for document in documents %}
+                        <tr>
+                            <td class="fw-semibold">{{ document.title }}</td>
+                            <td>{{ document.course.subject.name }}</td>
+                            <td>£{{ document.price }}</td>
+                            <td>
+                                <span class="badge {% if document.status == 'published' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ document.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{{ document.created_at|date:"d M Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'documents:detail' document.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                    {% comment %} <a href="{% url 'documents:edit' document.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'documents:delete' document.slug %}" class="btn btn-sm btn-outline-danger">Delete</a> {% endcomment %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="card p-5 text-center">
+            <p class="text-muted mb-3">You haven't uploaded any documents yet.</p>
+            <a href="{% url 'documents:upload' %}" class="btn btn-primary">
+                Upload Your First Notes
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

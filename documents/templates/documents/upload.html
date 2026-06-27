@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Notes | StudyMarket{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <h1 class="h3 fw-bold mb-1">Upload Notes</h1>
+            <p class="text-muted mb-4">Share your study materials with other students.</p>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_title">Title</label>
+                    <input type="text" class="form-control" name="title" id="id_title"
+                           placeholder="e.g. A-Level Biology Complete Notes"
+                           value="{{ form.title.value|default:'' }}">
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_course">Course</label>
+                    <select class="form-select" name="course" id="id_course">
+                        <option value="">Select a course...</option>
+                        {% for course in form.course.field.queryset %}
+                        <option value="{{ course.id }}" {% if form.course.value == course.id %}selected{% endif %}>
+                            {{ course.subject.name }} — {{ course.get_level_display }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.course.errors %}
+                        <div class="text-danger small mt-1">{{ form.course.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_price">Price (£)</label>
+                    <input type="number" class="form-control" name="price" id="id_price"
+                           min="0.50" max="50.00" step="0.01"
+                           value="{{ form.price.value|default:'' }}">
+                    {% if form.price.errors %}
+                        <div class="text-danger small mt-1">{{ form.price.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_preview_text">Preview Text</label>
+                    <textarea class="form-control" name="preview_text" id="id_preview_text" rows="3"
+                              placeholder="A short preview visible to all users before purchase...">{{ form.preview_text.value|default:'' }}</textarea>
+                    {% if form.preview_text.errors %}
+                        <div class="text-danger small mt-1">{{ form.preview_text.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_description">Full Description</label>
+                    <textarea class="form-control" name="description" id="id_description" rows="4"
+                              placeholder="Full description shown after purchase...">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="id_file">File (PDF)</label>
+                    <input type="file" class="form-control" name="file" id="id_file" accept=".pdf">
+                    {% if form.file.errors %}
+                        <div class="text-danger small mt-1">{{ form.file.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" for="id_status">Status</label>
+                    <select class="form-select" name="status" id="id_status">
+                        <option value="draft">Draft</option>
+                        <option value="published" selected>Published</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Upload Document
+                </button>
+            </form>
+
+            <a href="{% url 'documents:seller_dashboard' %}" class="btn btn-outline-secondary w-100 mt-2">
+                Cancel
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

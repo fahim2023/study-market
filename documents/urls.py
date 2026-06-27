@@ -6,4 +6,6 @@ app_name = "documents"
 urlpatterns = [
     path("browse/", views.browse, name="browse"),
     path("document/<slug:slug>/", views.document_detail, name="detail"),
+    path("seller/dashboard/", views.seller_dashboard, name="seller_dashboard"),
+    path("seller/upload/", views.upload_document, name="upload"),
 ]
