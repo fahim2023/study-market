@@ -20,16 +20,15 @@
         <div class="collapse navbar-collapse" id="navbarMain">
 
             <!-- Main nav links -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 mt-3 mt-lg-0">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'browse' %}fw-bold{% endif %}"
                        href="{% url 'documents:browse' %}">Browse</a>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'seller_dashboard' %}fw-bold{% endif %}" 
-                        href="{% url 'documents:seller_dashboard' %}">Sell
-                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'seller_dashboard' %}fw-bold{% endif %}"
+                       href="{% url 'documents:seller_dashboard' %}">Sell</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'my_purchases' %}fw-bold{% endif %}"
@@ -39,7 +38,7 @@
             </ul>
 
             <!-- Search bar -->
-            <form class="d-flex me-3" method="GET" action="{% url 'documents:browse' %}">
+            <form class="d-flex me-lg-3 my-3 my-lg-0" method="GET" action="{% url 'documents:browse' %}">
                 <div class="input-group">
                     <input
                         class="form-control form-control-sm"
@@ -47,7 +46,6 @@
                         name="q"
                         placeholder="Search notes..."
                         value="{{ request.GET.q }}"
-                        style="min-width: 200px;"
                     >
                     <button class="btn btn-outline-secondary btn-sm" type="submit">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -60,7 +58,7 @@
 
             <!-- Auth state -->
             {% if user.is_authenticated %}
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-2 pb-3 pb-lg-0">
                 <span class="text-muted small">Hi, {{ user.username }}</span>
                 <form method="POST" action="{% url 'accounts:logout' %}" class="d-inline">
                     {% csrf_token %}
@@ -68,7 +66,7 @@
                 </form>
             </div>
             {% else %}
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 pb-3 pb-lg-0">
                 <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm">Log in</a>
                 <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Register</a>
             </div>
