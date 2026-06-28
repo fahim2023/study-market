@@ -944,6 +944,20 @@ _(Each bug: issue, fix, before/after code, screenshot — added as they're hit a
 
 ---
 
+## Design Decisions
+
+### Subject Management — Admin Only
+
+The Subject model (which drives the subject filter on the browse page and the course dropdown on the upload form) is intentionally restricted to admin management only. Sellers cannot create new subjects or courses through the site interface — they can only select from the existing taxonomy when uploading a document.
+
+This was a deliberate architectural decision for the following reasons:
+
+- **Data integrity:** Allowing users to freely create subjects would result in duplicates, misspellings and inconsistent categorisation (e.g. "Maths", "Mathematics", "Math" all appearing as separate subjects).
+- **Taxonomy control:** The subject list represents the core organisational structure of the marketplace. Keeping it admin-controlled ensures it remains clean, consistent and meaningful for buyers browsing by subject.
+- **Scope:** For the purposes of this project, the predefined subjects (Biology, Economics, History, Law, Mathematics, Psychology) cover the core academic domains. New subjects can be added by a site administrator via the Django admin panel at `/admin/` as the platform grows.
+
+This is consistent with how real academic marketplaces manage their category taxonomies — categories are curated by the platform, not crowdsourced from sellers.
+
 ## Future Implementations
 
 - ***
