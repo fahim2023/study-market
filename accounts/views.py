@@ -26,7 +26,7 @@ def register(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("documents:browse")
+        return redirect("home:home")
 
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -34,7 +34,7 @@ def login_view(request):
             user = form.get_user()
             auth_login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
-            return redirect("documents:browse")
+            return redirect("home:home")
     else:
         form = AuthenticationForm()
 

@@ -850,6 +850,50 @@ def clean_file(self):
 ```
 
 With this in place, oversized files are rejected at form validation before any Cloudinary API call is made, and the user sees a clear error message on the upload form explaining the limit and what to do.
+
+### Bug 20: Login redirecting to browse page instead of homepage
+
+**Issue:** After logging in, users were being redirected to `/documents/browse/` instead of the homepage at `/`. This was inconsistent with the intended user experience — new users logging in for the first time should land on the homepage which explains the platform, not be dropped straight into the document grid.
+
+![Bug 20 before fix](documentation/images/bugs/bug-20-login-redirect-before.png)
+
+**Cause:** The `login_view` in `accounts/views.py` had a hardcoded `redirect("documents:browse")` on both the authenticated user check and the successful login path:
+
+```python
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("documents:browse")  # hardcoded
+
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
+            return redirect("documents:browse")  # hardcoded
+```
+
+This overrode the `LOGIN_REDIRECT_URL = 'home:home'` setting in `settings.py` entirely. Django's `LOGIN_REDIRECT_URL` setting is only used by the built-in authentication views — since we wrote a custom `login_view`, the setting had no effect and the hardcoded redirect in the view took precedence.
+
+**Fix:** Updated both redirect calls in `accounts/views.py` to point to `home:home` instead of `documents:browse`:
+
+```python
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("home:home")
+
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
+            return redirect("home:home")
+```
+
+After the fix, logging in correctly redirects users to the homepage.
+
+![Bug 20 after fix](documentation/images/bugs/bug-20-login-redirect-after.png)
 _(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
