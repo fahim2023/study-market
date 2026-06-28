@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
+from django.core.paginator import Paginator
 from .models import Document
 from courses.models import Subject
 from payments.models import Purchase
@@ -9,10 +10,6 @@ from django.contrib import messages
 
 
 def browse(request):
-    """
-    Main browse/homepage view. Lists all published documents,
-    with optional filtering by subject and keyword search.
-    """
     documents = Document.objects.filter(status="published").select_related(
         "course", "course__subject", "seller"
     )
@@ -27,11 +24,16 @@ def browse(request):
     if query:
         documents = documents.filter(title__icontains=query)
 
+    paginator = Paginator(documents, 12)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "documents": documents,
+        "documents": page_obj,
         "subjects": subjects,
         "selected_subject": subject_slug,
         "query": query,
+        "page_obj": page_obj,
     }
     return render(request, "documents/browse.html", context)
 
