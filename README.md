@@ -4,9 +4,9 @@
 
 [StudyMarket](#) is a full-stack academic marketplace built with Django, where students buy and sell revision notes, past-paper solutions and study guides. Free users can preview a teaser of each document; the full content unlocks immediately after a secure Stripe payment.
 
-[Click here to view the deployed site.](#)
+[Click here to view the deployed site.](https://study-market-fahim-70194c90b021.herokuapp.com/)
 
-[View the GitHub Repository](#)
+[View the GitHub Repository](https://github.com/fahim2023/study-market.git)
 
 ---
 
@@ -27,6 +27,9 @@
 - [UI Design](#ui-design)
   - [Colour Scheme](#colour-scheme)
   - [Typography](#typography)
+  - [Layout Spacing and Shape](#layout-spacing-and-shape)
+  - [Elevation and Depth](#elevation-and-depth)
+  - [Signature Component Locked Content State](#signature-component-locked-content-state)
   - [Imagery](#imagery)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
@@ -38,6 +41,7 @@
   - [Validator Testing](#validator-testing)
   - [Responsiveness](#responsiveness)
 - [Bugs](#bugs)
+- [Design Decisions](#design-decisions)
 - [Future Implementations](#future-implementations)
 - [Credits](#credits)
 
@@ -45,29 +49,63 @@
 
 ## Project Purpose
 
-_(One paragraph: what the site does, the value for buyers, the value for sellers, the value for the site owner.)_
+StudyMarket is a full-stack peer-to-peer academic marketplace built with Django, where students buy and sell revision notes, past-paper solutions and study guides. The platform solves a real problem in the student market: high-quality revision materials exist in abundance but are scattered across informal channels with no quality control, no payment infrastructure and no discoverability. StudyMarket brings these materials into a structured, searchable marketplace with a secure Stripe payment flow at its core.
+
+For **buyers**, the value is immediate — they can browse a curated catalog of subject-specific study materials, preview enough content to judge quality before committing, and gain instant access to a full document the moment payment is confirmed. The content gating is the central mechanic of the platform: every document shows a title, subject badge, seller name, price and a written preview snippet to all visitors, but the full content and download link are locked behind a Stripe payment. This ensures buyers can make an informed decision without being able to derive the full value for free.
+
+For **sellers**, the value is passive income from work they have already done. A student who has spent hours creating revision notes for their own A-Level Biology exam can upload those notes once, set a price, and earn money every time another student purchases them — without any additional effort. The seller dashboard gives them full control over their listings: upload, edit, delete and monitor their catalog from a single page.
+
+For the **site owner**, the value is a scalable platform that facilitates transactions between students while maintaining catalog quality through an admin-curated subject taxonomy, a purchase-gated review system and Django admin oversight of all listings, purchases and reviews.
+
+---
 
 ### Rationale
 
 #### Background
 
-_(The gap in the market this fills — why a peer-to-peer notes marketplace, not just a generic file host.)_
+Revision notes and past-paper solutions have always been shared informally between students — passed around in WhatsApp groups, uploaded to Google Drive folders, or sold individually on social media. These channels are unstructured, impossible to search, and offer no quality assurance or payment protection. A buyer has no way to preview content before paying, no recourse if the material is poor quality, and no guarantee of instant delivery.
+
+Generic file hosting platforms such as Dropbox or Google Drive lack any marketplace functionality — there is no browsing by subject, no payment mechanism, no seller reputation system and no content gating to protect sellers' intellectual property. Platforms like Scribd exist but operate on a subscription model that does not reward individual student sellers, are not tailored to the UK academic curriculum (GCSE, A-Level, undergraduate level), and do not provide the preview-then-unlock experience that makes the value proposition immediately clear to a new user.
+
+StudyMarket fills this gap by combining four things that no existing platform does together: a structured, searchable catalog of UK-curriculum academic materials; a per-document Stripe payment flow with instant access on success; a seller dashboard with full CRUD over listings; and a purchase-gated review system that ensures only verified buyers can leave feedback. The result is a trustworthy marketplace where both sides of the transaction — buyer and seller — have clear, protected incentives.
 
 #### Purpose
 
-_(Core purpose statement — should be immediately evident to a new visitor without documentation, per the assessment criteria.)_
+The core purpose of StudyMarket is to make high-quality, peer-created revision materials discoverable and accessible to students who need them, while rewarding the students who created them. This purpose is immediately evident to a new visitor without any documentation: the homepage hero states "Get exam-ready notes from students who've already aced the course", the browse page shows a grid of subject-tagged documents with prices and previews, and every document detail page makes the locked/unlocked distinction visually explicit — a blurred content card with a lock icon and "Unlock for £X" CTA for unpurchased documents, replaced by a green "You have access" card with a download button after payment.
+
+The payment-gating mechanic is the single most important feature of the platform and the primary reason a regular user cannot derive the full value of the site without paying. It is implemented at two levels: the `document_detail` view checks the `Purchase` model before deciding which template block to render, and a Stripe webhook provides a server-side backup that records purchases even if a buyer closes their browser before reaching the success page.
+
+---
 
 ### Target Audience
 
-_(Buyers, sellers, admin — each with their own needs, mirroring the user stories below.)_
+**Buyers — students preparing for exams**
+
+The primary buyer is a student at GCSE, A-Level or undergraduate level who is preparing for upcoming exams and needs high-quality revision materials quickly. They are time-poor and willing to pay a small fee (typically £3–£15) to save significant study time. They need to be able to find materials relevant to their specific subject and level, preview enough content to judge quality before committing to a purchase, trust that the payment process is secure, and receive instant access to the document the moment payment is confirmed. They may also want to leave a review after purchasing to help future buyers make informed decisions.
+
+**Sellers — students monetising their existing notes**
+
+The seller is typically a student who has recently completed a course — or is currently studying it — and has already created detailed revision notes for their own use. They want to earn passive income from work they have already done, with minimal effort. They need a simple, reliable upload flow where they can set a title, select the relevant course, write a preview and set a price. They need confidence that their full content is protected behind a payment wall so they are not giving away their work for free. They also need control over their listings — the ability to edit details or remove listings if the material becomes outdated.
+
+**Admins and site owners — platform curators**
+
+The admin is responsible for maintaining the quality and integrity of the platform. They curate the subject and course taxonomy through the Django admin panel, ensuring that the catalog remains well-organised and free of duplicates. They can moderate listings and reviews where necessary, monitor all purchase activity, and manage user accounts. The admin role also encompasses the site owner's commercial interest — ensuring that the payment-gating mechanic is watertight, that no user can access full content without paying, and that the Stripe integration is functioning correctly in production.
+
+---
 
 ### Data Domain
 
-_(Short description of the 8 models across 5 apps and how they relate — fuller detail goes in Database Design.)_
+StudyMarket's data is organised across 8 custom models in 5 Django apps. At the centre is the `Document` model, which belongs to a `Course` (itself grouped under a `Subject`) and is uploaded by a seller (`auth.User`). When a buyer purchases a document, a `Purchase` record is created linking that user to that document — this is the access control mechanism of the entire platform. Buyers who have a `Purchase` record can leave a `Review`. Each user also has a `Profile` (created automatically via signal) which stores whether they are a seller. `DocumentTag` provides a many-to-many tagging system for filtering. Full detail in the [Database Schema](#database-schema) section below.
+
+---
 
 ### Development Approach
 
-_(Agile/incremental approach, GitHub Issues if used, TDD note, tech stack summary: Django, PostgreSQL, Stripe, Bootstrap 5, Heroku.)_
+StudyMarket was built incrementally using an agile approach — one feature at a time, committed to git at natural feature-complete boundaries, and deployed to Heroku after each commit. No feature was considered done until it passed a `python manage.py check`, worked locally in the browser, and was verified on the live Heroku site.
+
+Test-Driven Development was applied to the model and view layer: automated tests were written alongside or immediately after each new model, catching regressions before they reached production. All test runs use a local SQLite database to avoid conflicts with Neon's connection pooling (see Bug 4).
+
+**Tech stack summary:** Django 5.2 · PostgreSQL (Neon) · Stripe · Bootstrap 5 · Cloudinary · Heroku · Whitenoise · Git/GitHub
 
 ---
 
@@ -75,31 +113,69 @@ _(Agile/incremental approach, GitHub Issues if used, TDD note, tech stack summar
 
 ### Goals and Objectives
 
-## **External user goals:**
+**External user goals:**
 
-## **Site owner goals:**
+- Browse and discover high-quality revision materials by subject and level without needing to register
+- Preview document content before committing to a purchase
+- Purchase documents securely via Stripe and gain instant access
+- Upload and sell their own study materials with full control over pricing and listings
+- Leave and manage reviews on purchased documents
+
+**Site owner goals:**
+
+- Provide a trustworthy marketplace where buyers cannot access full document content without paying
+- Maintain a well-organised, admin-curated subject taxonomy
+- Monitor all purchases and reviews through the Django admin panel
+- Ensure the platform is secure, with no credentials exposed and all sensitive actions requiring authentication
+
+---
 
 ### User Stories
 
 #### Visitor (not logged in)
 
-| #   | User Story | Proof |
-| --- | ---------- | ----- |
+| #   | User Story                                                                                                      | Proof                                                              |
+| --- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 1   | As a visitor I can browse all published documents so I can see what's on offer before registering               | Browse page accessible without login                               |
+| 2   | As a visitor I can view a document's title, course, price and preview text so I can decide if it's worth buying | Document detail page shows preview to all users                    |
+| 3   | As a visitor I cannot view the full document content or download it until I have paid                           | Locked content card shown to unauthenticated and unpurchased users |
+| 4   | As a visitor I can register an account so I can buy or sell documents                                           | `/accounts/register/`                                              |
+| 5   | As a visitor I can log in so I can access my purchases                                                          | `/accounts/login/`                                                 |
 
 #### Buyer
 
-| #   | User Story | Proof |
-| --- | ---------- | ----- |
+| #   | User Story                                                                         | Proof                                                       |
+| --- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 6   | As a buyer I can search documents by keyword so I can find relevant notes quickly  | Search bar on browse page filters by title                  |
+| 7   | As a buyer I can filter documents by subject so I can narrow results to my course  | Subject radio filter on browse sidebar                      |
+| 8   | As a buyer I can purchase a document via Stripe so I get full access to it         | Stripe checkout at `/payments/checkout/<id>/`               |
+| 9   | As a buyer I receive clear confirmation after a successful payment                 | Payment success page rendered after Stripe confirms payment |
+| 10  | As a buyer I can view and download any document I have purchased from My Purchases | My Purchases page at `/payments/my-purchases/`              |
+| 11  | As a buyer I can leave a rating and review on a document I have purchased          | Add review form gated behind purchase check                 |
+| 12  | As a buyer I cannot review a document I have not purchased                         | `add_review` view redirects unpurchased users               |
+| 13  | As a buyer I can edit my review if I change my mind                                | Edit review view at `/reviews/edit/<id>/`                   |
+| 14  | As a buyer I can delete my review                                                  | Delete review view at `/reviews/delete/<id>/`               |
 
 #### Seller
 
-| #   | User Story | Proof |
-| --- | ---------- | ----- |
+| #   | User Story                                                                                  | Proof                                                                            |
+| --- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 15  | As a seller I can upload a new document with title, description, price, course and PDF file | Upload form at `/documents/seller/upload/`                                       |
+| 16  | As a seller I can see all my listings on a dashboard so I can manage them                   | Seller dashboard at `/documents/seller/dashboard/`                               |
+| 17  | As a seller I can edit my own listings                                                      | Edit document view at `/documents/seller/edit/<slug>/`                           |
+| 18  | As a seller I can delete my own listings                                                    | Delete document view at `/documents/seller/delete/<slug>/`                       |
+| 19  | As a seller I cannot edit or delete another seller's listings                               | `get_object_or_404(Document, slug=slug, seller=request.user)` enforces ownership |
 
 #### Admin / Site Owner
 
-| #   | User Story | Proof |
-| --- | ---------- | ----- |
+| #   | User Story                                                                                        | Proof                                                               |
+| --- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 20  | As an admin I can manage subjects and courses so the catalog stays organised                      | Subject and Course models registered in Django admin                |
+| 21  | As an admin I can view all purchases so I can monitor sales activity                              | Purchase model registered in admin with list display                |
+| 22  | As an admin I can moderate reviews if needed                                                      | Review model registered in admin                                    |
+| 23  | As a site owner there is no way for a regular user to access full document content without paying | Purchase check in `document_detail` view; webhook backup via Stripe |
+
+---
 
 ### Wireframes
 
@@ -111,14 +187,169 @@ _(Desktop/mobile wireframes per key page — Browse, Document Detail, Upload, Se
 
 ### ERD
 
-_(Entity Relationship Diagram image.)_
+_(Entity Relationship Diagram image — to be added once finalised.)_
+
+---
 
 ### Database Schema
 
-| Model | Field | Type | Key | Notes |
-| ----- | ----- | ---- | --- | ----- |
+The database consists of 8 custom models across 5 Django apps. All models use Django's default `BigAutoField` as the primary key unless otherwise noted.
 
-## **Relationships:**
+---
+
+#### `accounts` app
+
+**Profile**
+
+| Field         | Type                        | Key | Constraints               | Notes                                         |
+| ------------- | --------------------------- | --- | ------------------------- | --------------------------------------------- |
+| `id`          | BigAutoField                | PK  | Auto, unique              | Django default primary key                    |
+| `user`        | OneToOneField → `auth.User` | FK  | Unique, CASCADE on delete | Links profile to Django's built-in User model |
+| `is_seller`   | BooleanField                |     | Default: False            | Distinguishes buyers from sellers             |
+| `bio`         | TextField                   |     | Blank, null               | Optional seller biography                     |
+| `institution` | CharField(100)              |     | Blank, null               | University or school name                     |
+
+**Relationships:**
+
+- `Profile.user` → `auth.User` (OneToOne) — created automatically via signal on user registration. Cascade delete ensures the profile is removed when the user account is deleted.
+
+---
+
+#### `courses` app
+
+**Subject**
+
+| Field  | Type           | Key | Constraints            | Notes                                       |
+| ------ | -------------- | --- | ---------------------- | ------------------------------------------- |
+| `id`   | BigAutoField   | PK  | Auto, unique           | Django default primary key                  |
+| `name` | CharField(100) |     | Unique                 | e.g. Biology, Mathematics, Law              |
+| `slug` | SlugField(120) |     | Unique, auto-generated | URL-safe version of name, generated on save |
+
+**Course**
+
+| Field        | Type                   | Key | Constraints                           | Notes                                          |
+| ------------ | ---------------------- | --- | ------------------------------------- | ---------------------------------------------- |
+| `id`         | BigAutoField           | PK  | Auto, unique                          | Django default primary key                     |
+| `subject`    | ForeignKey → `Subject` | FK  | CASCADE on delete                     | Groups courses under a subject area            |
+| `name`       | CharField(200)         |     |                                       | e.g. A-Level Biology, GCSE Mathematics         |
+| `level`      | CharField(20)          |     | Choices: gcse, a_level, undergraduate | Academic level of the course                   |
+| `exam_board` | CharField(50)          |     | Blank, null                           | e.g. AQA, Edexcel, OCR                         |
+| `slug`       | SlugField(250)         |     | Unique, auto-generated                | Generated from subject, name and level on save |
+
+**Relationships:**
+
+- `Course.subject` → `Subject` (ForeignKey, CASCADE) — a Subject can have many Courses. Deleting a Subject cascades to all its Courses.
+
+---
+
+#### `documents` app
+
+**Document**
+
+| Field          | Type                     | Key | Constraints                               | Notes                                             |
+| -------------- | ------------------------ | --- | ----------------------------------------- | ------------------------------------------------- |
+| `id`           | BigAutoField             | PK  | Auto, unique                              | Django default primary key                        |
+| `title`        | CharField(200)           |     |                                           | Document listing title                            |
+| `seller`       | ForeignKey → `auth.User` | FK  | CASCADE on delete                         | The user who uploaded this document               |
+| `course`       | ForeignKey → `Course`    | FK  | CASCADE on delete                         | The course this document belongs to               |
+| `description`  | TextField                |     |                                           | Full description shown after purchase             |
+| `preview_text` | TextField                |     |                                           | Short teaser visible to all users before purchase |
+| `file`         | FileField                |     | Upload to `documents/`                    | The PDF file stored on Cloudinary in production   |
+| `price`        | DecimalField(6,2)        |     |                                           | Price in GBP                                      |
+| `status`       | CharField(10)            |     | Choices: draft, published; Default: draft | Only published documents appear in browse         |
+| `slug`         | SlugField(250)           |     | Unique, auto-generated                    | Generated from title on save                      |
+| `created_at`   | DateTimeField            |     | Auto now add                              | Timestamp of upload                               |
+| `updated_at`   | DateTimeField            |     | Auto now                                  | Timestamp of last edit                            |
+
+**DocumentTag**
+
+| Field       | Type                         | Key | Constraints  | Notes                                 |
+| ----------- | ---------------------------- | --- | ------------ | ------------------------------------- |
+| `id`        | BigAutoField                 | PK  | Auto, unique | Django default primary key            |
+| `name`      | CharField(50)                |     | Unique       | e.g. exam-style, summary, diagrams    |
+| `documents` | ManyToManyField → `Document` | M2M |              | Tags can be applied to many documents |
+
+**Relationships:**
+
+- `Document.seller` → `auth.User` (ForeignKey, CASCADE) — a User can sell many Documents. Deleting a User cascades to all their Documents.
+- `Document.course` → `Course` (ForeignKey, CASCADE) — a Course can have many Documents. Deleting a Course cascades to all its Documents.
+- `DocumentTag.documents` → `Document` (ManyToMany) — a Tag can be applied to many Documents and a Document can have many Tags. Django creates a join table automatically.
+
+---
+
+#### `payments` app
+
+**Purchase**
+
+| Field                   | Type                     | Key | Constraints       | Notes                                     |
+| ----------------------- | ------------------------ | --- | ----------------- | ----------------------------------------- |
+| `id`                    | BigAutoField             | PK  | Auto, unique      | Django default primary key                |
+| `buyer`                 | ForeignKey → `auth.User` | FK  | CASCADE on delete | The user who made the purchase            |
+| `document`              | ForeignKey → `Document`  | FK  | CASCADE on delete | The document that was purchased           |
+| `stripe_payment_intent` | CharField(200)           |     | Unique            | Stripe PaymentIntent ID (`pi_...`)        |
+| `amount_paid`           | DecimalField(6,2)        |     |                   | Amount charged in GBP at time of purchase |
+| `created_at`            | DateTimeField            |     | Auto now add      | Timestamp of purchase                     |
+
+**Constraints:**
+
+- `unique_together = ('buyer', 'document')` — prevents a user from purchasing the same document twice
+
+**Relationships:**
+
+- `Purchase.buyer` → `auth.User` (ForeignKey, CASCADE) — a User can have many Purchases. Deleting a User cascades to all their Purchase records.
+- `Purchase.document` → `Document` (ForeignKey, CASCADE) — a Document can have many Purchases. Deleting a Document cascades to all related Purchase records.
+- The `Purchase` model is the access control mechanism of the platform — the `document_detail` view checks for a `Purchase` record before deciding whether to render the locked or unlocked content state.
+
+---
+
+#### `reviews` app
+
+**Review**
+
+| Field        | Type                     | Key | Constraints       | Notes                        |
+| ------------ | ------------------------ | --- | ----------------- | ---------------------------- |
+| `id`         | BigAutoField             | PK  | Auto, unique      | Django default primary key   |
+| `document`   | ForeignKey → `Document`  | FK  | CASCADE on delete | The document being reviewed  |
+| `reviewer`   | ForeignKey → `auth.User` | FK  | CASCADE on delete | The user leaving the review  |
+| `rating`     | IntegerField             |     | Choices: 1–5      | Star rating                  |
+| `comment`    | TextField                |     |                   | Written review body          |
+| `created_at` | DateTimeField            |     | Auto now add      | Timestamp of review creation |
+| `updated_at` | DateTimeField            |     | Auto now          | Timestamp of last edit       |
+
+**Constraints:**
+
+- `unique_together = ('document', 'reviewer')` — prevents a user from reviewing the same document twice
+
+**Relationships:**
+
+- `Review.document` → `Document` (ForeignKey, CASCADE) — a Document can have many Reviews. Deleting a Document cascades to all its Reviews.
+- `Review.reviewer` → `auth.User` (ForeignKey, CASCADE) — a User can write many Reviews. Deleting a User cascades to all their Reviews.
+- Reviews are purchase-gated at the view level — the `add_review` view checks for a `Purchase` record with matching `buyer` and `document` before allowing a review to be submitted.
+
+---
+
+### Relationships Summary
+
+```
+auth.User
+    │
+    ├──(OneToOne)──▶ Profile
+    │
+    ├──(FK, seller)──▶ Document
+    │                       │
+    │                       ├──(FK)──▶ Course ──(FK)──▶ Subject
+    │                       │
+    │                       ├──(M2M)──▶ DocumentTag
+    │                       │
+    │                       ├──(FK)──▶ Purchase ◀──(FK, buyer)── auth.User
+    │                       │
+    │                       └──(FK)──▶ Review ◀──(FK, reviewer)── auth.User
+    │
+    └──(FK, buyer)──▶ Purchase
+```
+
+**Key access control chain:**
+`auth.User` → `Purchase` → `Document` — a user can only access the full content of a Document if a Purchase record exists linking their User account to that Document.
 
 ---
 
@@ -139,7 +370,7 @@ A high-contrast palette distinguishes content navigation from transactional acti
 | Role      | Colour                               | Usage                                                                        |
 | --------- | ------------------------------------ | ---------------------------------------------------------------------------- |
 | Primary   | `#1A535C` (deep scholarly teal)      | Branding, headers, primary navigation — carries the "academic" weight        |
-| Secondary | `#F4A261` (warm, sun-faded orange)   | Reserved exclusively for CTAs ("Buy", "Unlock", "Upload") and success states |
+| Secondary | `#8e4e14` (warm amber-brown)         | Reserved exclusively for CTAs ("Buy", "Unlock", "Upload") and success states |
 | Neutral   | `#F8F9FA` and surrounding cool greys | Background layering to reduce visual fatigue during long study sessions      |
 | Error     | Standard red                         | Form/validation errors                                                       |
 | Info      | Soft blue                            | Informational banners                                                        |
@@ -155,23 +386,32 @@ Borders throughout stay a crisp, low-opacity dark grey to define structure witho
 - **Labels** use semibold weight with slight tracking to stay legible at small sizes (12–14px)
 - **Mobile** headlines scale down by one tier to avoid awkward wrapping on small screens
 
-### Layout, Spacing & Shape
+### Layout, Spacing and Shape
 
 - **Grid:** 12-column, 1280px max-width on desktop with 24px gutters; 4-column fluid grid with 16px margins on mobile
 - **Spacing rhythm:** 4px/8px baseline — 24px for most component spacing, 40px for section breathing room
 - **Corner radius:** 4px on standard elements (buttons, inputs, small cards), 8px on large containers, 12px on chips/status tags — a "soft" shape language balancing academic structure with marketplace approachability
 
-### Elevation & Depth
+### Elevation and Depth
 
 Depth is built from low-contrast outlines and ambient shadows rather than heavy drop shadows — intended to feel like paper layered on a desk, not objects floating in space. Cards sit on a white background with a 1px border at rest, gain a subtle diffused shadow on hover (signalling interactivity), and modals/overlays use a more pronounced shadow to separate them from the page behind.
 
 ### Signature Component: Locked Content State
 
-The single most important UI pattern on the site, since it's the visual proof of the payment-gating requirement: unpurchased document previews show a 4px backdrop blur over the content, with a centred lock icon and a "Purchase to Unlock" CTA in the secondary orange. This same locked/unlocked pairing is used consistently across the browse grid and the document detail page, so a user (or examiner) can immediately see the before/after of paying.
+The single most important UI pattern on the site, since it's the visual proof of the payment-gating requirement: unpurchased document previews show a backdrop blur over the content, with a centred lock icon and a "Purchase to Unlock" CTA in the secondary amber. This same locked/unlocked pairing is used consistently across the browse grid and the document detail page, so a user (or examiner) can immediately see the before/after of paying.
 
 ### Imagery
 
-_(Source of any stock imagery used for hero/browse thumbnails, attribution — to confirm once final images are chosen.)_
+Subject-specific photography is used for document card thumbnails throughout the browse page and homepage featured section. Images were generated using Google ImageFX with prompts designed to match the teal/amber colour palette of the site. Images used:
+
+- `hero_image.png` — laptop on teal desk, hero section
+- `biology.png` — biology textbooks and microscope on teal surface
+- `economics.png` — economics textbook with charts and graphs
+- `history.png` — vintage maps and handwritten notes on teal desk
+- `law.png` — open law textbook with case notes
+- `math.png` — mathematics notebook with equations and calculator
+- `psychology.png` — psychology textbooks with brain diagrams
+- `general.png` — general study notes and sticky notes on teal desk
 
 ---
 
@@ -179,51 +419,165 @@ _(Source of any stock imagery used for hero/browse thumbnails, attribution — t
 
 ### Navigation
 
+The sticky navbar includes the StudyMarket logo (links to homepage), Browse, Sell and My Purchases links (Sell and My Purchases visible to authenticated users only), a search bar that submits to the browse page, and Log in / Register buttons for anonymous users or Hi, username / Log out for authenticated users. On mobile the navbar collapses to a hamburger menu with a clean dropdown layout.
+
 ### Homepage
 
-### Browse & Filter
+A multi-section landing page consisting of: a hero section with headline, subtext, Browse Notes and How it works CTAs, and a hero image with a floating "Top Rated Resource" badge; an Explore by Subject grid with Bootstrap Icons for each subject; a Featured Revision Guides section pulling the 6 most recent published documents with subject images, ratings and prices; a How StudyMarket Works section with two contrasting cards (light for buyers, teal for sellers) each with icon-led steps; and a CTA strip inviting users to get started or become a seller.
+
+### Browse and Filter
+
+A full document catalog with a sidebar filter (subject radio buttons, Apply Filters button, Clear filter link) and a responsive 3-column document grid. Each card shows a subject-specific thumbnail image with a locked overlay, subject badge, document title, seller name, star rating and price with a Buy Now button. Pagination shows 12 documents per page with smart ellipsis navigation. Search filters by title keyword and combines with subject filters via query parameters.
 
 ### Document Detail (Locked / Unlocked States)
 
+The document detail page shows all users the breadcrumb, course badge, title, publish date, file type and a preview text card. The content below the preview is gated: unauthenticated users see a Log in to purchase button; authenticated but unpurchased users see a locked content card with a lock icon and Unlock for £X CTA linking to Stripe checkout; users who have purchased see a green "You have access" card with the full description and a Download Document button. The sidebar shows seller information, price and the appropriate action button. Below the main content, a reviews section shows all reviews with star ratings and comments, plus Edit/Delete buttons for the review author, and a Write a Review button for users who have purchased but not yet reviewed.
+
 ### Upload Document
+
+A seller upload form at `/documents/seller/upload/` allowing authenticated users to upload a PDF document with title, course selection, price, preview text, full description and status (draft/published). File size is validated client-side and server-side — files over 10MB are rejected with a clear error message before the Cloudinary upload is attempted.
 
 ### Checkout (Stripe)
 
+The Stripe checkout page renders a secure card input element (card number, expiry, CVC — postal code hidden for UK compatibility). On form submission, a POST request fetches a PaymentIntent `client_secret` from the server, which is used by `stripe.confirmCardPayment()` in `checkout.js` to process the payment. On success the user is redirected to the payment success page and a `Purchase` record is created. A Stripe webhook at `/payments/webhook/` provides server-side backup purchase recording for `payment_intent.succeeded` events, verified using the webhook signing secret.
+
 ### Seller Dashboard
+
+A table view of all documents uploaded by the logged-in seller, showing title, subject, price, status badge, upload date and View/Edit/Delete action buttons. An Upload Notes button links to the upload form. Empty state shown when no documents have been uploaded.
 
 ### My Purchases
 
+A list of all documents purchased by the logged-in buyer, showing subject badge, document title, purchase date, amount paid, and Download and View buttons for each purchase. Empty state shown with a Browse Notes CTA when no purchases exist.
+
 ### Reviews
+
+Full CRUD for reviews on purchased documents. Add review form with radio-button star rating (1–5) and comment textarea, gated behind purchase check. Edit and delete forms with confirmation. Reviews displayed on the document detail page with reviewer username, date, star rating and comment. Edit/Delete buttons visible only to the review author.
 
 ### Admin Panel
 
-_(Each gets a short description + screenshot once built.)_
+Django admin registered for all models: Subject, Course, Document, DocumentTag, Purchase, Review and Profile. Each has appropriate `list_display`, `list_filter` and `search_fields` configured for efficient management.
+
+### Custom 404 Page
+
+A custom `404.html` template that extends `base.html`, showing a friendly "Page Not Found" message with a Back to Home button. Served automatically by Django when `DEBUG=False`.
 
 ---
 
 ## Technologies Used
 
-## **Frontend:**
+### Frontend
 
-## **Backend:**
+- **HTML5** — semantic markup used throughout all templates to convey structure and support accessibility
+- **CSS3** — custom design system built in `static/css/style.css`, implementing the StudyMarket brand palette, typography scale, component styles and responsive breakpoints
+- **Bootstrap 5.3** — responsive grid system, utility classes, navbar, cards, forms, badges and pagination components, loaded via CDN
+- **Bootstrap Icons 1.11** — icon library used for subject icons, how-it-works step icons and UI affordances, loaded via CDN
+- **JavaScript (ES6+)** — custom JS written in `payments/static/payments/js/checkout.js` to handle the Stripe payment flow: fetching the PaymentIntent client secret via POST, mounting the Stripe card element, confirming payment and redirecting on success
+- **Stripe.js v3** — Stripe's official JavaScript library loaded from `https://js.stripe.com/v3/`, used to create the secure card input element and confirm card payments client-side
+- **Google Fonts (Inter)** — loaded via `<link>` in `base.html`, used as the sole typeface across the entire site for maximum readability and a clean, systematic appearance
 
-## **Database:**
+### Backend
 
-## **Storage:**
+- **Python 3.12** — primary programming language
+- **Django 5.2 LTS** — full-stack web framework providing the ORM, URL routing, template engine, authentication system, admin panel, form validation and management commands
+- **Stripe Python SDK (`stripe==15.2.1`)** — used server-side in `payments/views.py` to create PaymentIntents and in `stripe_webhook` to verify and process incoming webhook events
+- **Gunicorn** — WSGI HTTP server used to serve the Django application in production on Heroku
 
-## **Deployment:**
+### Database
 
-## **Development Tools:**
+- **PostgreSQL** — relational database used in both development and production, hosted on **Neon** (serverless Postgres). Connected via `dj-database-url` which parses the `DATABASE_URL` environment variable into Django's `DATABASES` setting
+- **SQLite** — used exclusively during automated test runs to avoid conflicts between Django's test database create/destroy cycle and Neon's connection pooling (see Bug 4)
 
-## **Validation Tools:**
+### Storage
 
-## **Django Packages:**
+- **Cloudinary** — cloud media storage used in production to persist user-uploaded PDF files across Heroku dyno restarts. Configured via `django-cloudinary-storage` using the `STORAGES['default']` backend
+- **Whitenoise 6.12** — serves compressed, hashed static files (CSS, JS, images) directly from Django in production without requiring a separate static file server. Configured as the `STORAGES['staticfiles']` backend
+
+### Deployment
+
+- **Heroku** — cloud platform used to host the production application. Configured with a `Procfile` declaring the Gunicorn web process and a `release` command running `python manage.py migrate` on every deploy
+- **GitHub** — version control and remote repository hosting. Every feature is committed incrementally with descriptive commit messages
+
+### Development Tools
+
+- **Git** — version control system used throughout development with granular, feature-level commits
+- **VS Code** — primary code editor
+- **Faker** — Python library used in the `seed_documents` management command to generate realistic fake document titles, descriptions and preview text for the seed data
+- **ReportLab** — Python library used in the seed management command to generate dummy PDF files for seeded documents
+
+### Validation Tools
+
+- **W3C HTML Validator** — used to validate all HTML templates
+- **W3C CSS Validator (Jigsaw)** — used to validate `static/css/style.css`
+- **JSHint** — used to validate `checkout.js`
+- **CI Python Linter (PEP8)** — used to validate all Python files against PEP8 style guidelines
+
+### Django Packages
+
+| Package                     | Version | Purpose                                          |
+| --------------------------- | ------- | ------------------------------------------------ |
+| `django`                    | 5.2     | Core framework                                   |
+| `gunicorn`                  | 26.0.0  | Production WSGI server                           |
+| `psycopg2-binary`           | 2.9.12  | PostgreSQL adapter                               |
+| `dj-database-url`           | 3.1.2   | Parse DATABASE_URL into Django DATABASES         |
+| `whitenoise`                | 6.12.0  | Static file serving in production                |
+| `cloudinary`                | 1.44.2  | Cloudinary Python SDK                            |
+| `django-cloudinary-storage` | 0.3.0   | Django storage backend for Cloudinary media      |
+| `stripe`                    | 15.2.1  | Stripe Python SDK for payment processing         |
+| `django-crispy-forms`       | 2.6     | Form rendering helpers                           |
+| `crispy-bootstrap5`         | 2026.3  | Bootstrap 5 template pack for crispy forms       |
+| `Faker`                     | 40.23.0 | Fake data generation for seed command            |
+| `reportlab`                 | 5.0.0   | PDF generation for seed command                  |
+| `pillow`                    | 12.2.0  | Image processing (required by Django ImageField) |
 
 ---
 
 ## Security Features
 
-_(Env vars, .gitignore, DEBUG handling, login_required, ownership checks, CSRF, password hashing, ORM/no direct DB access — fill in as each is implemented.)_
+### Environment Variables and Secret Key Management
+
+All sensitive credentials — including the Django `SECRET_KEY`, database connection string (`DATABASE_URL`), Stripe publishable and secret keys, Stripe webhook secret, and Cloudinary API credentials — are stored as environment variables and never committed to the repository. Locally these are loaded from `env.py`, which is listed in `.gitignore`. In production, all variables are set directly in Heroku's config vars via the CLI (`heroku config:set`). This ensures that no credentials are exposed in the codebase, git history or GitHub repository at any point.
+
+### DEBUG Mode
+
+`DEBUG` is controlled by an environment variable:
+
+```python
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+```
+
+In local development `DEBUG=True` is set in `env.py`. On Heroku, the `DEBUG` config var is not set, so it defaults to `"False"`, meaning the production site never exposes stack traces, SQL queries or internal settings to end users. The custom `404.html` template is served instead of Django's debug error page when `DEBUG=False`.
+
+### Authentication and Authorisation
+
+- All views that require a logged-in user are decorated with `@login_required`, which redirects unauthenticated users to `/accounts/login/` automatically
+- The login and register pages are only accessible to anonymous users — authenticated users are redirected to the homepage immediately
+- Sellers can only edit or delete their own documents. The `edit_document` and `delete_document` views use `get_object_or_404(Document, slug=slug, seller=request.user)` — if a user attempts to access another seller's edit or delete URL, Django returns a 404 rather than an unauthorised error, preventing information disclosure
+- Only buyers who have a `Purchase` record for a document can leave a review. The `add_review` view checks for a matching purchase before rendering the form or processing a submission
+- Only buyers who have left a review can edit or delete it. The `edit_review` and `delete_review` views use `get_object_or_404(Review, id=review_id, reviewer=request.user)`
+
+### Content Gating
+
+The core security requirement of the project — that no regular user can access the full value of a document without paying — is enforced at two levels:
+
+1. **View level:** The `document_detail` view queries the `Purchase` model before passing `has_purchased` to the template. The template renders the locked content card for unpurchased users and the unlocked card with a download link only for users with a confirmed purchase record.
+
+2. **Webhook level:** The Stripe webhook view (`stripe_webhook`) listens for `payment_intent.succeeded` events sent directly from Stripe's servers. It verifies the event signature using `stripe.Webhook.construct_event` and the `STRIPE_WEBHOOK_SECRET` before creating a `Purchase` record. This ensures that even if a buyer closes their browser before reaching the success page, the purchase is still recorded and access is granted.
+
+### CSRF Protection
+
+Django's `CsrfViewMiddleware` is active in the middleware stack, providing CSRF protection on all POST requests including the login form, logout form, checkout, review submission, document upload and all delete confirmations. The Stripe webhook view is the only exception — it is decorated with `@csrf_exempt` because Stripe's servers cannot provide a Django CSRF token, and the request is instead verified using Stripe's own signature verification mechanism.
+
+### Password Security
+
+Django's default password hashing framework is used, which applies PBKDF2 with a SHA256 hash and a random salt by default. Passwords are never stored in plain text. Django's built-in `AUTH_PASSWORD_VALIDATORS` are configured to enforce minimum length, reject common passwords, reject purely numeric passwords, and reject passwords too similar to the username.
+
+### Database Access
+
+No raw SQL is used anywhere in the codebase. All database interactions go through Django's ORM, which parameterises all queries automatically and provides protection against SQL injection. Regular users have no direct access to the database — all reads and writes must pass through the application's views and model layer.
+
+### Sensitive Data in Logs
+
+Django's `SafeExceptionReporterFilter` is active by default, which redacts sensitive settings values (such as `SECRET_KEY`, `DATABASE_URL` and Stripe keys) from error reports and the Heroku log output, even when an uncaught exception occurs.
 
 ---
 
@@ -231,27 +585,190 @@ _(Env vars, .gitignore, DEBUG handling, login_required, ownership checks, CSRF, 
 
 ### Prerequisites
 
+Before deploying, ensure you have the following installed and configured:
+
+- Python 3.12
+- Git
+- Heroku CLI (`brew install heroku` on macOS)
+- A [Heroku](https://heroku.com) account
+- A [Neon](https://neon.tech) PostgreSQL database
+- A [Cloudinary](https://cloudinary.com) account
+- A [Stripe](https://stripe.com) account with test mode enabled
+
+---
+
 ### Clone the Repository
 
 ```bash
-git clone
+git clone https://github.com/fahim2023/study-market.git
 cd study-market
 ```
 
+---
+
 ### Local Development Setup
 
-1.
-2.
-3.
+1. **Create and activate a virtual environment**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+```
+
+2. **Install dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+3. **Create `env.py` in the project root**
+
+```python
+import os
+
+os.environ.setdefault("SECRET_KEY", "your-secret-key-here")
+os.environ.setdefault("DEBUG", "True")
+os.environ.setdefault("DATABASE_URL", "your-neon-postgres-url-here")
+os.environ.setdefault("STRIPE_PUBLIC_KEY", "pk_test_your-key-here")
+os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_your-key-here")
+os.environ.setdefault("STRIPE_WEBHOOK_SECRET", "whsec_your-key-here")
+os.environ.setdefault("CLOUDINARY_CLOUD_NAME", "your-cloud-name")
+os.environ.setdefault("CLOUDINARY_API_KEY", "your-api-key")
+os.environ.setdefault("CLOUDINARY_API_SECRET", "your-api-secret")
+```
+
+> `env.py` is listed in `.gitignore` and must never be committed to the repository.
+
+4. **Apply migrations**
+
+```bash
+python manage.py migrate
+```
+
+5. **Create a superuser**
+
+```bash
+python manage.py createsuperuser
+```
+
+6. **Seed the database with sample documents (optional)**
+
+```bash
+python manage.py seed_documents
+```
+
+7. **Run the development server**
+
+```bash
+python manage.py runserver
+```
+
+The site will be available at `http://127.0.0.1:8000/`.
+
+---
 
 ### Deploy to Heroku
 
-1.
-2.
+1. **Log in to Heroku**
 
-### Static & Media Files
+```bash
+heroku login
+```
 
-_(Whitenoise for static; media file storage solution TBD — likely Cloudinary, since Heroku's filesystem isn't persistent.)_
+2. **Create a new Heroku app**
+
+```bash
+heroku create your-app-name
+```
+
+3. **Set all environment variables in Heroku config vars**
+
+```bash
+heroku config:set SECRET_KEY=your-secret-key-here
+heroku config:set DEBUG=False
+heroku config:set DATABASE_URL=your-neon-postgres-url-here
+heroku config:set STRIPE_PUBLIC_KEY=pk_test_your-key-here
+heroku config:set STRIPE_SECRET_KEY=sk_test_your-key-here
+heroku config:set STRIPE_WEBHOOK_SECRET=whsec_your-key-here
+heroku config:set CLOUDINARY_CLOUD_NAME=your-cloud-name
+heroku config:set CLOUDINARY_API_KEY=your-api-key
+heroku config:set CLOUDINARY_API_SECRET=your-api-secret
+heroku config:set DISABLE_COLLECTSTATIC=1
+```
+
+> `DISABLE_COLLECTSTATIC=1` is required because `django-cloudinary-storage` is incompatible with Django 5.2's `collectstatic` command (see Bug 16). Static files are collected locally and committed to the repository instead.
+
+4. **Confirm the `Procfile` exists in the project root**
+
+```
+web: gunicorn studymarket.wsgi:application --log-file -
+release: python manage.py migrate
+```
+
+The `release` command runs `migrate` automatically on every deploy before traffic is switched to the new release.
+
+5. **Collect static files locally and commit**
+
+Before pushing to Heroku, temporarily comment out `cloudinary_storage` and `cloudinary` from `INSTALLED_APPS` in `settings.py`, run collectstatic, then uncomment:
+
+```bash
+python manage.py collectstatic --noinput
+git add staticfiles/
+git commit -m "Update staticfiles manifest"
+```
+
+6. **Push to Heroku**
+
+```bash
+git push heroku main
+```
+
+7. **Verify the deployment**
+
+```bash
+heroku open
+heroku logs --tail
+```
+
+---
+
+### Stripe Webhook Setup
+
+1. Log in to the [Stripe Dashboard](https://dashboard.stripe.com)
+2. Go to **Developers → Webhooks → Add destination**
+3. Set the endpoint URL to `https://your-app-name.herokuapp.com/payments/webhook/`
+4. Select the event `payment_intent.succeeded`
+5. Copy the signing secret (`whsec_...`) and set it as a Heroku config var:
+
+```bash
+heroku config:set STRIPE_WEBHOOK_SECRET=whsec_your-signing-secret
+```
+
+---
+
+### Static and Media Files
+
+**Static files** (CSS, JS, images) are served by Whitenoise directly from Django in production. They are collected locally using `python manage.py collectstatic` and the resulting `staticfiles/` directory is committed to the repository. Heroku's automatic `collectstatic` step is disabled via `DISABLE_COLLECTSTATIC=1` due to the `django-cloudinary-storage` incompatibility with Django 5.2 (see Bug 16).
+
+**Media files** (user-uploaded PDFs) are stored on Cloudinary using the `cloudinary_storage.storage.MediaCloudinaryStorage` backend. Cloudinary provides persistent storage that survives Heroku dyno restarts, which would otherwise wipe any files uploaded to Heroku's ephemeral filesystem. The Cloudinary free plan supports files up to 10MB — file size validation is enforced at form level in `DocumentForm.clean_file()` to prevent uploads exceeding this limit.
+
+---
+
+### Environment Variables Reference
+
+| Variable                | Description                                 | Where to obtain                                                                                                            |
+| ----------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `SECRET_KEY`            | Django secret key                           | Generate with `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"` |
+| `DEBUG`                 | Django debug mode                           | Set to `False` in production                                                                                               |
+| `DATABASE_URL`          | PostgreSQL connection string                | Neon dashboard → Connection string                                                                                         |
+| `STRIPE_PUBLIC_KEY`     | Stripe publishable key (`pk_test_...`)      | Stripe dashboard → Developers → API keys                                                                                   |
+| `STRIPE_SECRET_KEY`     | Stripe secret key (`sk_test_...`)           | Stripe dashboard → Developers → API keys                                                                                   |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) | Stripe dashboard → Developers → Webhooks                                                                                   |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name                       | Cloudinary dashboard → API Keys                                                                                            |
+| `CLOUDINARY_API_KEY`    | Cloudinary API key                          | Cloudinary dashboard → API Keys                                                                                            |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret                       | Cloudinary dashboard → API Keys                                                                                            |
+| `DISABLE_COLLECTSTATIC` | Disables Heroku's automatic collectstatic   | Set to `1`                                                                                                                 |
 
 ---
 
@@ -259,7 +776,7 @@ _(Whitenoise for static; media file storage solution TBD — likely Cloudinary, 
 
 ### Automated Testing
 
-All automated tests use Django's built-in testing framework. Tests run against a local SQLite database rather than the production Neon Postgres instance — hosted Postgres connection pooling conflicts with Django's test runner repeatedly creating/destroying a throwaway test database, so `settings.py` routes test runs to SQLite explicitly (see Bug 4 below).
+All automated tests use Django's built-in testing framework. Tests run against a local SQLite database rather than the production Neon Postgres instance — hosted Postgres connection pooling conflicts with Django's test runner repeatedly creating/destroying a throwaway test database, so `settings.py` routes test runs to SQLite explicitly (see Bug 4).
 
 #### accounts app
 
@@ -272,7 +789,7 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_tag_str_returns_name`                           | DocumentTag string representation returns the tag name                         | Pass   | ![](documentation/images/testing/test-documents-tag-str-pass.png)           |
 | `test_document_slug_auto_generated`                   | Document slug is auto-generated from the title on save                         | Pass   | ![](documentation/images/testing/test-documents-slug-pass.png)              |
 
-## Payments App Testing
+#### payments app
 
 | Test                                | Description                                                                                                                       | Result  | Screenshot                                             |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------ |
@@ -280,7 +797,7 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_duplicate_purchase_prevented` | Attempting to create a duplicate Purchase for the same buyer and document raises an exception due to `unique_together` constraint | ✅ Pass | ![](documentation/images/testing/payments-test-02.png) |
 | `test_checkout_requires_login`      | Unauthenticated users attempting to access the checkout page are redirected to the login page with a 302 response                 | ✅ Pass | ![](documentation/images/testing/payments-test-03.png) |
 
-## Reviews App Testing
+#### reviews app
 
 | Test                                  | Description                                                                                              | Result  | Screenshot                                            |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------- |
@@ -288,29 +805,41 @@ All automated tests use Django's built-in testing framework. Tests run against a
 | `test_unpurchased_user_cannot_review` | A user who has not purchased a document is redirected away from the review form and no review is created | ✅ Pass | ![](documentation/images/testing/reviews-test-02.png) |
 | `test_purchased_user_can_review`      | A user who has purchased a document can successfully submit a review which is saved to the database      | ✅ Pass | ![](documentation/images/testing/reviews-test-03.png) |
 
-### Automated Testing
-
-_(Test tables per app once tests are written.)_
+---
 
 ### Manual Testing
 
-_(User story → test → expected → actual → pass/fail table.)_
+_(User story → test → expected → actual → pass/fail table — to be completed.)_
+
+---
 
 ### Validator Testing
 
 #### HTML Validation
 
+_(W3C validator results — to be completed.)_
+
 #### CSS Validation
+
+_(Jigsaw validator results — to be completed.)_
 
 #### Python PEP8 Validation
 
+_(CI Python Linter results — to be completed.)_
+
 #### JavaScript
+
+_(JSHint results for `checkout.js` — to be completed.)_
 
 #### Lighthouse
 
+_(Lighthouse scores for key pages — to be completed.)_
+
+---
+
 ### Responsiveness
 
-_(Chrome / Safari / Firefox × Desktop / Tablet / Mobile.)_
+_(Chrome / Safari / Firefox × Desktop / Tablet / Mobile — to be completed.)_
 
 ---
 
@@ -343,15 +872,18 @@ git push heroku main
 - **Root cause:** `runtime.txt` is Heroku's older, now-deprecated method for pinning a Python version. Heroku's current buildpack expects a `.python-version` file instead, containing only the major version number (no `python-` prefix, no patch version).
 - **Fix:** Removed `runtime.txt` and replaced it with `.python-version` containing just the major version.
 
-\*\*Before ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.png)
-\*\*After ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.png)
+**Before** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.png)
+**After** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.png)
+
+---
 
 ### Bug 3 — collectstatic failed: STATIC_ROOT not set
 
 - **Issue:** After fixing Bugs 1 and 2, the Heroku build progressed further but then failed during the automatic `python manage.py collectstatic --noinput` step, raising `django.core.exceptions.ImproperlyConfigured: You're using the staticfiles app without having set the STATIC_ROOT setting to a filesystem path.`
 - **Root cause:** `STATIC_ROOT` had never been added to `settings.py`. In development, Django's dev server serves static files automatically and doesn't need this setting, so the omission only surfaced once `DEBUG=False` and Heroku's build pipeline tried to gather all static files into a single deployable folder.
 - **Fix:** Added `STATIC_ROOT` pointing at a `staticfiles` folder, and configured Whitenoise's compressed manifest storage backend so static files are served efficiently in production. Also confirmed `whitenoise.middleware.WhiteNoiseMiddleware` was present in `MIDDLEWARE`, directly after `SecurityMiddleware`.
-  **Before (`settings.py`):**
+
+**Before (`settings.py`):**
 
 ```python
 STATIC_URL = 'static/'
@@ -370,49 +902,19 @@ STORAGES = {
 }
 ```
 
-```bash
-python manage.py check
-python manage.py collectstatic --noinput
-git add studymarket/settings.py
-git commit -m "Configure STATIC_ROOT and Whitenoise for static file serving"
-git push origin main
-git push heroku main
-```
-
 - **Screenshot:** ![Bug 3](documentation/images/bugs/bug-03-static-root.png)
+
+---
 
 ### Bug 4 — Test database errors against hosted Postgres (Neon)
 
-- **Issue:** Running `python manage.py test accounts` passed the actual test, but then crashed during teardown with `psycopg2.errors.ObjectInUse: database "test_neondb" is being accessed by other users`. Re-running the command afterwards then failed even earlier with `database "test_neondb" already exists`.
+- **Issue:** Running `python manage.py test accounts` passed the actual test, but then crashed during teardown with `psycopg2.errors.ObjectInUse: database "test_neondb" is being accessed by other users`.
+- **Root cause:** Django's test runner creates a throwaway test database and destroys it after the run. Neon's connection pooling keeps a session open against the database in a way that blocks Postgres from dropping it, so the teardown step fails and leaves a stale `test_neondb` behind.
+- **Fix:** Routed test runs to a local SQLite database instead of Neon.
 
-```bash
-Destroying test database for alias 'default'...
-Traceback (most recent call last):
-...
-File "/Users/fahim/Desktop/study_market/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 103, in \_execute
-return self.cursor.execute(sql)
-^^^^^^^^^^^^^^^^^^^^^^^^
-django.db.utils.OperationalError: database "test_neondb" is being accessed by other users
-DETAIL: There is 1 other session using the database.
-
-======================================================================
-
-Got an error creating the test database: database "test_neondb" already exists
-Type 'yes' if you would like to try deleting the test database 'test_neondb', or 'no' to cancel: yes
-Destroying old test database for alias 'default'...
-Got an error recreating the test database: database "test_neondb" is being accessed by other users
-DETAIL: There is 1 other session using the database.
-```
-
-- **Root cause:** Django's test runner creates a throwaway test database and destroys it after the run. Neon's connection pooling keeps a session open against the database in a way that blocks Postgres from dropping it, so the teardown step fails and leaves a stale `test_neondb` behind, which then blocks the next run from creating a fresh one.
-- **Fix:** Routed test runs to a local SQLite database instead of Neon, since hosted Postgres connection pooling isn't well suited to the repeated create/destroy cycle of Django's test runner. The production/development database configuration is untouched — this only applies when the `test` management command is running.
-  **Added to `settings.py`, directly after the `DATABASES` block:**
+**Added to `settings.py`:**
 
 ```python
-# When running tests, use a local SQLite database instead of the
-# Neon Postgres instance. Hosted Postgres connection pooling can hold
-# onto sessions in a way that conflicts with Django's test runner
-# repeatedly creating/destroying a throwaway test database.
 if 'test' in sys.argv:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -420,138 +922,79 @@ if 'test' in sys.argv:
     }
 ```
 
-`test_db.sqlite3` was also added to `.gitignore`, alongside the existing `db.sqlite3` entry.
+---
 
 ### Bug 5 — Heroku release command failed: missing login_view function
 
-- **Issue:** `git push heroku main` built and deployed successfully, but the automatic `release: python manage.py migrate` step then failed with `AttributeError: module 'accounts.views' has no attribute 'login_view'`, and the release was rejected.
-- **Root cause:** `accounts/urls.py` referenced `views.login_view`, but a custom `login_view` function had not yet been written in `accounts/views.py` at the time of that commit — only the route was added, not the view itself. This passed local testing because the dev server hadn't been restarted to pick up the missing reference, but Heroku's release phase runs `manage.py check` fresh on every deploy, which immediately caught the broken import.
-- **Fix:** Added the missing `login_view` function to `accounts/views.py`, handling both the GET (render empty form) and POST (validate credentials, log in, redirect) cases using Django's built-in `AuthenticationForm`.
-- **Note on safety:** Because the release command failed, Heroku did not switch traffic to the broken release — the previous working version stayed live throughout. This confirmed the value of the `release` phase running checks _before_ a deploy goes live, rather than after.
-
-```bash
-python manage.py check
-python manage.py runserver
-# confirm /accounts/login/ works locally before pushing again
-git add accounts/views.py accounts/urls.py
-git commit -m "Fix missing login_view function"
-git push origin main
-git push heroku main
-```
+- **Issue:** `git push heroku main` built and deployed successfully, but the automatic `release: python manage.py migrate` step then failed with `AttributeError: module 'accounts.views' has no attribute 'login_view'`.
+- **Root cause:** `accounts/urls.py` referenced `views.login_view`, but a custom `login_view` function had not yet been written in `accounts/views.py` at the time of that commit.
+- **Fix:** Added the missing `login_view` function to `accounts/views.py`.
 
 - **Screenshot:** ![Bug 5](documentation/images/bugs/bug-05-login-view-error.png)
 
+---
+
 ### Bug 6 — Custom CSS not applying: missing STATICFILES_DIRS
 
-- **Issue:** The site rendered with default Bootstrap colours instead of the custom teal/orange design system palette defined in `static/css/style.css`, even though Bootstrap itself loaded correctly and `style.css` had the right content.
-- **Root cause:** `STATICFILES_DIRS` was missing from `settings.py`. `STATIC_ROOT` only defines where `collectstatic` _outputs_ files for production — it does not tell Django where to _find_ source static files during development. Without `STATICFILES_DIRS` pointing at the project's `static/` folder, Django had no way to locate `style.css` at all, confirmed by `python manage.py findstatic css/style.css` returning "No matching file found."
-- **Fix:** Added `STATICFILES_DIRS = [BASE_DIR / "static"]` to `settings.py`, alongside the existing `STATIC_URL` and `STATIC_ROOT` settings.
-  **Before:**
+- **Issue:** The site rendered with default Bootstrap colours instead of the custom teal/amber design system palette, even though `style.css` had the right content.
+- **Root cause:** `STATICFILES_DIRS` was missing from `settings.py`. Without it, Django had no way to locate `style.css` at all during development.
+- **Fix:** Added `STATICFILES_DIRS = [BASE_DIR / "static"]` to `settings.py`.
 
-```python
-STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-```
-
-**After:**
-
-```python
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-```
-
-```bash
-python manage.py findstatic css/style.css
-python manage.py check
-git add studymarket/settings.py
-git commit -m "Fix missing STATICFILES_DIRS so custom CSS is found"
-git push origin main
-git push heroku main
-```
-
-- **Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.png)
-- **After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.png)
-
-### Bug 7 — InvalidStorageError: missing 'default' key in STORAGES
-
-- **Issue:** Attempting to save a `Document` with a file upload in Django admin crashed with `django.core.files.storage.handler.InvalidStorageError: Could not find config for 'default' in settings.STORAGES`.
-- **Root cause:** The `STORAGES` setting in `settings.py` only defined the `staticfiles` backend (for Whitenoise), but Django's `FileField` on the `Document` model also requires a `default` backend to know where to store uploaded media files. Without it, any attempt to save a file upload crashes immediately.
-- **Note:** This was also the likely root cause of the unexplained 500 error on `/accounts/login/` in production — the missing `default` storage key would crash any page rendering a file field, even just displaying a form.
-- **Fix:** Added the `default` key to `STORAGES` and confirmed `MEDIA_URL` and `MEDIA_ROOT` were set correctly.
-
-**Before (`settings.py`):**
-
-```python
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-```
-
-**After (`settings.py`):**
-
-```python
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-```
-
-- **Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.png)
-- **After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.png)
-
-### Bug 8: `{% load static %}` placed before `{% extends %}` in checkout template
-
-**Issue:** `TemplateSyntaxError` at `/payments/checkout/242/` when navigating to the checkout page. Django threw the error: `{% extends "base.html" %} must be the first tag in 'payments/checkout.html'`, preventing the page from rendering entirely.
-
-![Bug 8 before fix](documentation/images/bugs/bug-08-extends-before.png)
-
-**Cause:** When separating the Stripe JavaScript into a static file, `{% load static %}` was added to the top of `checkout.html` on line 1, pushing `{% extends "base.html" %}` down to line 2. Django's template engine requires `{% extends %}` to be the absolute first tag in any template that inherits from a base template — nothing can precede it, including `{% load %}` tags.
-
-**Fix:** Swapped the order so `{% extends "base.html" %}` appears on line 1 and `{% load static %}` appears on line 2. Django processes `{% extends %}` before anything else, so `{% load static %}` works correctly when placed after it.
-
-![Bug 8 after fix](documentation/images/bugs/bug-08-extends-after.png)
-
-### Bug 9: Footer not sticking to bottom of page on short pages
-
-**Issue:** On pages with little content such as the checkout page, the footer floated halfway up the screen leaving a large blank gap below it.
-
-![Bug 9 before fix](documentation/images/bugs/bug-09-footer-before.png)
-
-**Cause:** The `body` element had no minimum height set, so on pages where the content didn't fill the viewport, the footer would render immediately after the content rather than at the bottom of the page.
-
-**Fix:** Added `min-height: 100vh` and `display: flex; flex-direction: column` to the `body` in `style.css`, and `flex: 1` to the `main` element. This forces the main content area to expand and fill all available space, pushing the footer to the bottom regardless of content length.
-
-![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.png)
-
-### Bug 10: Checkout page throwing UnboundLocalError and payment not completing
-
-Three related issues prevented the payment flow from working end to end. Each was identified and fixed in sequence.
+**Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.png)
+**After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.png)
 
 ---
 
-**Issue 1 — UnboundLocalError on GET request**
+### Bug 7 — InvalidStorageError: missing 'default' key in STORAGES
 
-When navigating to the checkout page, Django threw an `UnboundLocalError: cannot access local variable 'intent' where it is not associated with a value` at `payments/views.py line 33`.
+- **Issue:** Attempting to save a `Document` with a file upload crashed with `django.core.files.storage.handler.InvalidStorageError: Could not find config for 'default' in settings.STORAGES`.
+- **Root cause:** The `STORAGES` setting only defined the `staticfiles` backend. Django's `FileField` also requires a `default` backend for media file uploads.
+- **Fix:** Added the `default` key to `STORAGES`.
+
+**Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.png)
+**After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.png)
+
+---
+
+### Bug 8: `{% load static %}` placed before `{% extends %}` in checkout template
+
+**Issue:** `TemplateSyntaxError` at `/payments/checkout/242/` — `{% extends "base.html" %} must be the first tag in 'payments/checkout.html'`.
+
+![Bug 8 before fix](documentation/images/bugs/bug-08-extends-before.png)
+
+**Cause:** When separating the Stripe JavaScript into a static file, `{% load static %}` was added to line 1, pushing `{% extends "base.html" %}` to line 2. Django requires `{% extends %}` to be the absolute first tag in any template that inherits from a base.
+
+**Fix:** Swapped the order so `{% extends "base.html" %}` appears on line 1 and `{% load static %}` on line 2.
+
+![Bug 8 after fix](documentation/images/bugs/bug-08-extends-after.png)
+
+---
+
+### Bug 9: Footer not sticking to bottom of page on short pages
+
+**Issue:** On pages with little content, the footer floated halfway up the screen leaving a large blank gap below it.
+
+![Bug 9 before fix](documentation/images/bugs/bug-09-footer-before.png)
+
+**Cause:** The `body` element had no minimum height set, so on short pages the footer rendered immediately after the content.
+
+**Fix:** Added `min-height: 100vh` and `display: flex; flex-direction: column` to `body` in `style.css`, and `flex: 1` to `main`.
+
+![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.png)
+
+---
+
+### Bug 10: Checkout page throwing UnboundLocalError and payment not completing
+
+Three related issues prevented the payment flow from working end to end.
+
+**Issue 1 — UnboundLocalError on GET request**
 
 ![Bug 10 before - UnboundLocalError](documentation/images/bugs/bug-10-unbound-intent-before.png)
 
-**Cause:** The `return JsonResponse` statement had been accidentally placed outside the `if request.method == "POST"` block. On a GET request, `intent` is never created because the Stripe API is only called on POST, so Python raised an error when trying to access `intent.client_secret`.
+**Cause:** The `return JsonResponse` statement was outside the `if request.method == "POST"` block. On a GET request, `intent` is never created so Python raised an error accessing `intent.client_secret`.
 
-```python
-# Broken — JsonResponse outside the POST block
-if request.method == "POST":
-    intent = stripe.PaymentIntent.create(...)
-return JsonResponse({"client_secret": intent.client_secret})
-```
-
-**Fix:** Moved `return JsonResponse` inside the POST block and added a `return render` for GET requests so the checkout page renders correctly on first load.
+**Fix:** Moved `return JsonResponse` inside the POST block and added a `return render` for GET requests.
 
 ```python
 # Fixed
@@ -565,279 +1008,161 @@ return render(request, "payments/checkout.html", {
 })
 ```
 
----
-
 **Issue 2 — Postal code field blocking payment**
-
-After fixing Issue 1, the checkout page rendered correctly but the Stripe card element showed a postal code field that only accepted numeric digits. UK postcodes contain letters so the field could never be completed, blocking payment.
 
 ![Bug 10 before - postal code](documentation/images/bugs/bug-10-postal-code-before.png)
 
-**Cause:** Stripe's card element defaults to US postal code format (5 numeric digits). Setting `locale: 'en-GB'` did not resolve the issue.
+**Cause:** Stripe's card element defaults to US postal code format (5 numeric digits). UK postcodes contain letters so the field could never be completed.
 
-**Fix:** Added `hidePostalCode: true` to the card element options in `checkout.js` to remove the field entirely, as postal code validation is not required for test payments.
+**Fix:** Added `hidePostalCode: true` to the card element options in `checkout.js`.
 
 ```javascript
-// Before
-const card = elements.create("card");
-
-// After
-const card = elements.create("card", {
-  hidePostalCode: true,
-});
+const card = elements.create("card", { hidePostalCode: true });
 ```
-
----
 
 **Issue 3 — client_secret not being passed to Stripe**
 
-After fixing Issues 1 and 2, clicking Pay produced no visible response. The browser console showed `IntegrationError: Invalid value for stripe.confirmCardPayment intent secret: value should be a client secret of the form ${id}_secret_${secret}. You specified: .`
-
 ![Bug 10 before - console error](documentation/images/bugs/bug-10-client-secret-console-before.png)
 
-The Network tab confirmed the POST request was returning 200 OK with the correct JSON including a valid `client_secret`.
+**Cause:** The JS was reading `clientSecret` from an HTML data attribute set at page load, which is empty on GET because no PaymentIntent exists until form submission.
 
-![Bug 10 before - network response](documentation/images/bugs/bug-10-client-secret-network-after.png)
-
-**Cause:** The JS was reading `clientSecret` from the `data-client-secret` HTML attribute set at page load. However this attribute is empty on GET because no PaymentIntent exists until the form is submitted. The `client_secret` was being fetched correctly via POST but the JS was ignoring it and using the empty attribute value instead.
+**Fix:** Changed the JS to use `data.client_secret` from the POST response.
 
 ```javascript
-// Broken — using empty data attribute from page load
-const result = await stripe.confirmCardPayment(clientSecret, {
-  payment_method: { card: card },
-});
-```
-
-**Fix:** Changed the JS to use `data.client_secret` from the POST response, which contains the actual PaymentIntent secret returned by the checkout view.
-
-```javascript
-// Fixed — using client_secret from POST response
 const data = await response.json();
 const result = await stripe.confirmCardPayment(data.client_secret, {
   payment_method: { card: card },
 });
 ```
 
-After all three fixes the payment flow completed successfully, the success page rendered, and the Purchase record was confirmed in the database.
-
 ![Bug 10 after - payment success](documentation/images/bugs/bug-10-payment-success-after.png)
+
+---
 
 ### Bug 11: Incorrect field name `title` used in payments test setUp
 
-**Cause:** `Course` model uses `name` not `title`. The error was caught by the test runner.
+**Cause:** `Course` model uses `name` not `title`. Caught by the test runner.
 
-**Fix:** Changed `title='A-Level Maths'` to `name='A-Level Maths'` in `payments/tests.py` setUp.
+**Fix:** Changed `title='A-Level Maths'` to `name='A-Level Maths'` in `payments/tests.py`.
+
+---
 
 ### Bug 12: Footer missing on deployed Heroku site
 
-**Issue:** The footer was visible locally but completely absent on the live Heroku deployment. Inspecting the page source on Heroku confirmed the footer HTML was not being rendered — after `</main>` the page went straight to the Bootstrap `<script>` tag and `</body>`, with no footer element present.
+**Issue:** The footer was visible locally but completely absent on Heroku.
 
 ![Bug 12 before fix](documentation/images/bugs/bug-12-footer-missing-before.png)
 
-**Cause:** The `{% include 'includes/footer.html' %}` line had been added to `templates/base.html` locally but was never staged and committed to git. Because Heroku deploys from the git repository rather than the local file system, it was running with the older version of `base.html` that had no footer include. The file looked correct locally because the working directory had the change, but `git show HEAD:templates/base.html` confirmed the committed version did not contain the footer include line.
+**Cause:** The `{% include 'includes/footer.html' %}` line had been added to `base.html` locally but never committed to git. Confirmed with `git show HEAD:templates/base.html | grep footer` which returned nothing.
 
-```bash
-# Confirmed footer include was missing from committed base.html
-git show HEAD:templates/base.html | grep footer
-# returned nothing
-```
-
-**Fix:** Staged and committed `templates/base.html` with the footer include in place, then pushed to both GitHub and Heroku.
-
-```html
-<!-- Added to base.html before the closing </body> tag -->
-{% include 'includes/footer.html' %}
-```
-
-After deploying, the footer rendered correctly on the live site.
+**Fix:** Staged and committed `templates/base.html` with the footer include in place.
 
 ![Bug 12 after fix](documentation/images/bugs/bug-12-footer-missing-after.png)
 
+---
+
 ### Bug 13: Reviews section missing from document detail page
 
-**Issue:** After deleting a review, the reviews section disappeared entirely from the document detail page — including the "Write a Review" button, meaning there was no way to add a new review.
+**Issue:** After deleting a review, the reviews section disappeared entirely — including the "Write a Review" button.
 
 ![Bug 13 before fix](documentation/images/bugs/bug-13-reviews-section-missing-before.png)
 
-**Cause:** When the detail template was rewritten to wire up the checkout buttons, the reviews section lost its wrapping `<div class="card p-4 mb-4">` container and the `{% if has_purchased and not user_has_reviewed %}` block containing the "Write a Review" button. The `{% for review in reviews %}` loop remained but without the card wrapper or the button, leaving the section invisible when there were no reviews to iterate over.
+**Cause:** When the detail template was rewritten to wire up checkout buttons, the reviews section lost its wrapping card container and the `{% if has_purchased and not user_has_reviewed %}` block.
 
-**Fix:** Rewrote the reviews section with the correct structure — a card wrapper containing the reviews loop, a fallback "No reviews yet" message when the queryset is empty, and the "Write a Review" button rendered conditionally when the user has purchased the document but not yet left a review.
-
-```html
-<div class="card p-4 mb-4">
-  <h2 class="h5 fw-bold mb-3">Reviews</h2>
-  {% if reviews %} {% for review in reviews %} ... {% endfor %} {% else %}
-  <p class="text-muted mb-3">
-    No reviews yet. Be the first to review this document.
-  </p>
-  {% endif %} {% if has_purchased and not user_has_reviewed %}
-  <a
-    href="{% url 'reviews:add_review' document.id %}"
-    class="btn btn-outline-secondary mt-2"
-  >
-    Write a Review
-  </a>
-  {% endif %}
-</div>
-```
+**Fix:** Rewrote the reviews section with the correct card wrapper, fallback "No reviews yet" message and conditional "Write a Review" button.
 
 ![Bug 13 after fix](documentation/images/bugs/bug-13-reviews-section-missing-after.png)
 
+---
+
 ### Bug 14: Heroku 500 error on document detail page after reviews app added
 
-**Issue:** After adding the `reviews` app, the live Heroku site threw a 500 Internal Server Error on all document detail pages while the local development server worked fine.
+**Issue:** All document detail pages threw 500 Internal Server Error on Heroku while working locally.
 
 ![Bug 14 before fix](documentation/images/bugs/bug-14-heroku-500-before.png)
 
-**Cause:** Several local changes had never been staged and committed to git, meaning Heroku was deploying an incomplete codebase. The missing changes were:
+**Cause:** Several local changes had never been staged and committed — most critically, `reviews` was added to `INSTALLED_APPS` locally but the updated `settings.py` was never committed, so Heroku threw `RuntimeError: Model class reviews.models.Review doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS`.
 
-- `reviews` was added to `INSTALLED_APPS` locally but the updated `settings.py` was never committed, so Heroku did not know the `reviews` app existed. This caused Django to throw `RuntimeError: Model class reviews.models.Review doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS` every time the document detail view tried to import the `Review` model.
-- `payments/views.py` had local changes not committed.
-- `studymarket/urls.py` had the `reviews/` path added locally but not committed.
-- `requirements.txt` had new packages not committed.
+**Fix:** Ran `git status`, identified all uncommitted files, staged and committed everything.
 
-The Heroku release command was failing silently on each deploy attempt, leaving the dyno running the previous broken version of the code. This was confirmed by running `heroku releases:output v72` which showed the full traceback.
-
-**Fix:** Ran `git status` which revealed the uncommitted files, then staged and committed all outstanding changes:
-
-```bash
-git add .
-git commit -m "Commit any missed changes"
-git push origin main
-git push heroku main
-```
-
-After deploying, the document detail page loaded correctly on the live site.
-
-**Prevention:** Always run `git status` before pushing to confirm no local changes have been left uncommitted. Each feature should be committed in its entirety before moving on.
+**Prevention:** Always run `git status` before pushing. Each feature should be committed in its entirety before moving on.
 
 ![Bug 14 after fix](documentation/images/bugs/bug-14-heroku-500-after.png)
 
+---
+
 ### Bug 15: Stripe publishable key not set on Heroku causing payments to fail
 
-**Issue:** On the live Heroku site, clicking the "Unlock" button to purchase a document produced no visible response — the checkout page loaded correctly with the card element, but pressing Pay did nothing. Opening the browser developer console revealed the error: `Uncaught IntegrationError: Please call Stripe() with your publishable key. You used an empty string.`
+**Issue:** On the live site, clicking Unlock did nothing. The browser console showed `Uncaught IntegrationError: Please call Stripe() with your publishable key. You used an empty string.`
 
 ![Bug 15 before fix](documentation/images/bugs/bug-15-stripe-public-key-before.png)
 
-**Cause:** The `STRIPE_PUBLIC_KEY` environment variable had not been configured in Heroku's config vars. Locally, all environment variables are loaded from `env.py` at runtime. However `env.py` is listed in `.gitignore` and is never committed to the repository or deployed to Heroku — this is intentional for security reasons, as it contains secret keys. Without the variable being explicitly set in Heroku's config vars, `os.environ.get('STRIPE_PUBLIC_KEY', '')` in `settings.py` returned an empty string. This empty string was passed through the Django template context into the `data-public-key` attribute on the `div#stripe-data` element, which `checkout.js` then read and passed to `Stripe()` — causing Stripe's JS library to throw the integration error and refuse to initialise.
+**Cause:** `STRIPE_PUBLIC_KEY` had not been set in Heroku's config vars. `env.py` is in `.gitignore` and never deployed — every variable in `env.py` must also be set manually in Heroku config vars. During the fix, the secret key (`sk_test_...`) was accidentally entered as the public key — this was caught immediately and corrected.
 
-The issue only appeared on Heroku and not locally because the local `env.py` had the key correctly set. This is a common deployment gotcha with environment-variable-based configuration — every variable in `env.py` must also be manually set in Heroku's config vars.
-
-During the fix, the Stripe secret key (`sk_test_...`) was accidentally entered as the value for `STRIPE_PUBLIC_KEY` instead of the publishable key (`pk_test_...`). This was caught immediately and corrected — the two keys serve different purposes: the publishable key is safe to expose in the frontend JS, while the secret key must never leave the server.
-
-**Fix:** Set the correct Stripe publishable key in Heroku config vars using the CLI:
+**Fix:**
 
 ```bash
 heroku config:set STRIPE_PUBLIC_KEY=pk_test_...
-```
-
-The value was confirmed with:
-
-```bash
 heroku config:get STRIPE_PUBLIC_KEY
 ```
 
-After the dyno restarted with the correct key, the Stripe card element initialised correctly, the payment flow completed successfully, and the success page rendered on the live site.
-
 ![Bug 15 after fix](documentation/images/bugs/bug-15-stripe-public-key-after.png)
+
+---
 
 ### Bug 16: Cloudinary `django-cloudinary-storage` incompatible with Django 5.2 causing Heroku build failure
 
-**Issue:** After installing `cloudinary` and `django-cloudinary-storage` for media file persistence on Heroku, every subsequent deploy failed during the build process. The Heroku build log showed the error occurring during the automatic `python manage.py collectstatic --noinput` step:
-
-```
-AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'. Did you mean: 'STATICFILES_DIRS'?
-Error: Unable to generate Django static files.
-Push rejected, failed to compile Python app.
-```
-
-This meant no new code could be deployed to Heroku until the issue was resolved.
+**Issue:** Every Heroku deploy failed during `collectstatic` with `AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'`.
 
 ![Bug 16 before fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-before.png)
 
-**Cause:** The `django-cloudinary-storage==0.3.0` package was written for older versions of Django that used `STATICFILES_STORAGE` as a top-level settings key to configure the static files storage backend. In Django 4.2, this key was deprecated in favour of the new `STORAGES` dictionary which consolidates both `DEFAULT_FILE_STORAGE` and `STATICFILES_STORAGE` into a single setting. By Django 5.2, `STATICFILES_STORAGE` was removed entirely from the framework.
+**Cause:** `django-cloudinary-storage==0.3.0` still references `settings.STATICFILES_STORAGE` which was removed in Django 5.2. The package itself needed updating but the maintainers had not released a compatible version.
 
-The `django-cloudinary-storage` package's overridden `collectstatic` management command still contained a reference to `settings.STATICFILES_STORAGE` on line 27 of its source:
-
-```python
-if (settings.STATICFILES_STORAGE == 'cloudinary_storage.storage.StaticCloudinaryStorage' or
-```
-
-Since `STATICFILES_STORAGE` no longer exists as an attribute on the Django settings object in Django 5.2, Python raised an `AttributeError` every time Heroku ran `collectstatic` during the build, causing the entire build to fail and the push to be rejected.
-
-An initial fix attempt of replacing `DEFAULT_FILE_STORAGE` with the new `STORAGES` dictionary in `settings.py` did not resolve the issue, because the problem was inside the third-party `django-cloudinary-storage` package itself — not in our project's settings. The package would need to be updated by its maintainers to support Django 5.2.
-
-**Fix:** Since Whitenoise already handles static file serving reliably on Heroku, Cloudinary is only needed for user-uploaded media files (PDFs). There was no need for `django-cloudinary-storage` to intercept the `collectstatic` process at all. The fix was to disable Heroku's automatic `collectstatic` call by setting a config var:
+**Fix:** Since Whitenoise handles static files, `collectstatic` was disabled on Heroku via:
 
 ```bash
 heroku config:set DISABLE_COLLECTSTATIC=1
 ```
 
-Static files continue to be collected locally and served by Whitenoise as before. Cloudinary handles only the media file storage backend via the `STORAGES` setting in `settings.py`:
-
-```python
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-```
-
-After setting the config var and pushing again, the Heroku build succeeded and the application deployed correctly.
+Static files are instead collected locally and committed to the repository.
 
 ![Bug 16 after fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-after.png)
 
+---
+
 ### Bug 17: NoReverseMatch on seller dashboard — edit and delete URLs not yet registered
 
-**Issue:** After successfully uploading a document via the seller upload form, Django redirected to the seller dashboard at `/documents/seller/dashboard/`. The page immediately threw a `NoReverseMatch` error: `Reverse for 'edit' not found. 'edit' is not a valid view function or pattern name.` The dashboard was completely inaccessible.
+**Issue:** After uploading a document, the redirect to the seller dashboard threw `NoReverseMatch: Reverse for 'edit' not found`.
 
 ![Bug 17 before fix](documentation/images/bugs/bug-17-no-reverse-match-before.png)
 
-**Cause:** The `seller_dashboard.html` template was written in full, including Edit and Delete action buttons for each document row, before the corresponding `edit_document` and `delete_document` views and their URL patterns had been built. Django resolves all `{% url %}` template tags at render time — if any named URL cannot be found in the URL configuration, it raises a `NoReverseMatch` exception immediately, preventing the entire page from rendering. The template contained:
+**Cause:** The `seller_dashboard.html` template was written with Edit and Delete buttons before the corresponding views and URL patterns had been built. Django resolves all `{% url %}` tags at render time and raises `NoReverseMatch` immediately if any named URL cannot be found.
 
-```html
-<a href="{% url 'documents:edit' document.slug %}">Edit</a>
-<a href="{% url 'documents:delete' document.slug %}">Delete</a>
-```
-
-Neither `documents:edit` nor `documents:delete` existed in `documents/urls.py` at the time, causing the crash.
-
-**Fix:** Temporarily removed the Edit and Delete buttons from `seller_dashboard.html`, leaving only the View button which correctly resolves to `documents:detail`. The edit and delete views, URLs and templates are being built as separate subsequent features. This restored the dashboard to a working state immediately.
+**Fix:** Temporarily removed the Edit and Delete buttons from the dashboard template until the views and URLs were built.
 
 ---
 
 ### Bug 18: Upload page returning 404 at incorrect URL path
 
-**Issue:** Attempting to navigate to `http://127.0.0.1:8000/seller/upload/` returned a 404 Page Not Found error. Django listed all registered URL patterns in the debug output and none of them matched `seller/upload/`.
+**Issue:** Navigating to `http://127.0.0.1:8000/seller/upload/` returned a 404 error.
 
 ![Bug 18 before fix](documentation/images/bugs/bug-18-upload-404-before.png)
 
-**Cause:** The upload view is registered inside `documents/urls.py`, which is itself included in the project URLs under the `documents/` prefix in `studymarket/urls.py`:
+**Cause:** The upload view is registered inside `documents/urls.py` which is included under the `documents/` prefix. The correct path is `http://127.0.0.1:8000/documents/seller/upload/`.
 
-```python
-path("documents/", include("documents.urls")),
-```
-
-This means all document URLs — including the upload page — are prefixed with `documents/`. The correct path is therefore `http://127.0.0.1:8000/documents/seller/upload/`, not `http://127.0.0.1:8000/seller/upload/`. The `documents/` prefix was being omitted when typing the URL directly into the browser.
-
-**Fix:** Used the correct full URL path `http://127.0.0.1:8000/documents/seller/upload/`. All internal links in templates use `{% url 'documents:upload' %}` which Django resolves correctly — this was purely a manual browser navigation error during testing.
+**Fix:** Used the correct full URL path. All internal links use `{% url 'documents:upload' %}` which Django resolves correctly.
 
 ---
 
 ### Bug 19: Cloudinary rejecting file uploads over 10MB with unhandled BadRequest exception
 
-**Issue:** When attempting to upload a large PDF (57MB) via the seller upload form, Django threw an unhandled `BadRequest` exception with the message: `File size too large. Got 59705814. Maximum is 10485760. Upgrade your plan to enjoy higher limits`. The error page was shown to the user with no helpful feedback.
+**Issue:** Uploading a 57MB PDF threw an unhandled `BadRequest: File size too large. Got 59705814. Maximum is 10485760.`
 
 ![Bug 19 before fix](documentation/images/bugs/bug-19-cloudinary-file-size-before.png)
 
-**Cause:** Cloudinary's free plan enforces a 10MB maximum file size per upload. The `DocumentForm` had no file size validation — it accepted any file regardless of size, passed it to Django's file handling pipeline, and only when the file was actually sent to Cloudinary's API did the size limit get enforced. At that point Cloudinary returned an error which Django raised as an unhandled `BadRequest` exception, crashing the view and showing the user the Django debug error page rather than a friendly validation message.
+**Cause:** `DocumentForm` had no file size validation — it accepted any file and only hit the Cloudinary limit after the full upload was sent to the API.
 
-This is poor defensive design — the error should be caught before the file ever reaches Cloudinary, saving both the upload bandwidth and giving the user a clear, actionable message.
-
-**Fix:** Added a `clean_file` method to `DocumentForm` in `documents/forms.py` that checks the file size before the form is considered valid. If the file exceeds 10MB, a `ValidationError` is raised and displayed to the user inline on the form:
+**Fix:** Added a `clean_file` method to `DocumentForm` to reject files over 10MB before any Cloudinary API call is made:
 
 ```python
 def clean_file(self):
@@ -849,86 +1174,35 @@ def clean_file(self):
     return file
 ```
 
-With this in place, oversized files are rejected at form validation before any Cloudinary API call is made, and the user sees a clear error message on the upload form explaining the limit and what to do.
+---
 
 ### Bug 20: Login redirecting to browse page instead of homepage
 
-**Issue:** After logging in, users were being redirected to `/documents/browse/` instead of the homepage at `/`. This was inconsistent with the intended user experience — new users logging in for the first time should land on the homepage which explains the platform, not be dropped straight into the document grid.
+**Issue:** After logging in, users were redirected to `/documents/browse/` instead of the homepage.
 
 ![Bug 20 before fix](documentation/images/bugs/bug-20-login-redirect-before.png)
 
-**Cause:** The `login_view` in `accounts/views.py` had a hardcoded `redirect("documents:browse")` on both the authenticated user check and the successful login path:
+**Cause:** The custom `login_view` had hardcoded `redirect("documents:browse")` which overrode the `LOGIN_REDIRECT_URL = 'home:home'` setting entirely. Django's `LOGIN_REDIRECT_URL` only applies to the built-in auth views, not custom views.
 
-```python
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect("documents:browse")  # hardcoded
-
-    if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            messages.success(request, f"Welcome back, {user.username}!")
-            return redirect("documents:browse")  # hardcoded
-```
-
-This overrode the `LOGIN_REDIRECT_URL = 'home:home'` setting in `settings.py` entirely. Django's `LOGIN_REDIRECT_URL` setting is only used by the built-in authentication views — since we wrote a custom `login_view`, the setting had no effect and the hardcoded redirect in the view took precedence.
-
-**Fix:** Updated both redirect calls in `accounts/views.py` to point to `home:home` instead of `documents:browse`:
-
-```python
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect("home:home")
-
-    if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            messages.success(request, f"Welcome back, {user.username}!")
-            return redirect("home:home")
-```
-
-After the fix, logging in correctly redirects users to the homepage.
+**Fix:** Updated both redirect calls in `accounts/views.py` to `redirect("home:home")`.
 
 ![Bug 20 after fix](documentation/images/bugs/bug-20-login-redirect-after.png)
 
+---
+
 ### Bug 21: Heroku 500 error — missing staticfiles manifest entry for 'css/style.css'
 
-**Issue:** After deploying, the live Heroku site threw a 500 Internal Server Error on every page. Checking `heroku logs --tail` revealed the error:
-
-```
-ValueError: Missing staticfiles manifest entry for 'css/style.css'
-```
+**Issue:** After deploying, every page on Heroku threw 500 with `ValueError: Missing staticfiles manifest entry for 'css/style.css'`.
 
 ![Bug 21 before fix](documentation/images/bugs/bug-21-staticfiles-manifest-before.png)
 
-**Cause:** Whitenoise's `CompressedManifestStaticFilesStorage` backend requires a `staticfiles.json` manifest file that maps original static file names to their hashed versions (e.g. `style.css` → `style.96c167679735.css`). This manifest is generated by `python manage.py collectstatic`.
+**Cause:** Whitenoise's `CompressedManifestStaticFilesStorage` requires a `staticfiles.json` manifest generated by `collectstatic`. Since `DISABLE_COLLECTSTATIC=1` was set (Bug 16), Heroku never ran collectstatic. Additionally `staticfiles/` was in `.gitignore` so the locally-generated manifest was never committed. The Cloudinary incompatibility also prevented running collectstatic locally with Cloudinary installed.
 
-Earlier in the project, `DISABLE_COLLECTSTATIC=1` was set as a Heroku config var to prevent the `django-cloudinary-storage` package from crashing the build during `collectstatic` (Bug 16). While this fixed the build failure, it had a side effect — Heroku never ran `collectstatic` at all, so the manifest was never generated. Without the manifest, Whitenoise cannot resolve static file URLs at runtime and throws a `ValueError` on every page load.
+**Fix:**
 
-Additionally, `staticfiles/` was listed in `.gitignore`, meaning the locally-generated manifest was never committed to the repository, so Heroku had no way of obtaining it.
-
-The same `AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'` error from Bug 16 also prevented running `collectstatic` locally with Cloudinary in `INSTALLED_APPS`.
-
-**Fix:** Three steps were required:
-
-1. Temporarily commented out `cloudinary_storage` and `cloudinary` from `INSTALLED_APPS` in `settings.py` to allow `collectstatic` to run locally without the Cloudinary package intercepting it:
-
-```python
-# 'cloudinary_storage',
-# 'cloudinary',
-```
-
-2. Ran `collectstatic` locally to generate the manifest:
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-3. Removed `staticfiles/` from `.gitignore` and committed the generated manifest to the repository, then restored the Cloudinary apps in `INSTALLED_APPS`:
+1. Temporarily commented out `cloudinary_storage` and `cloudinary` from `INSTALLED_APPS`
+2. Ran `python manage.py collectstatic --noinput` locally
+3. Removed `staticfiles/` from `.gitignore` and committed the manifest
 
 ```bash
 git add staticfiles/ .gitignore
@@ -937,10 +1211,7 @@ git push origin main
 git push heroku main
 ```
 
-After deploying, Whitenoise could resolve all static file URLs correctly and the live site loaded without errors. Going forward, `collectstatic` must be run locally and the `staticfiles/` folder committed whenever static files are changed.
-
 ![Bug 21 after fix](documentation/images/bugs/bug-21-staticfiles-manifest-after.png)
-_(Each bug: issue, fix, before/after code, screenshot — added as they're hit and resolved.)_
 
 ---
 
@@ -948,32 +1219,59 @@ _(Each bug: issue, fix, before/after code, screenshot — added as they're hit a
 
 ### Subject Management — Admin Only
 
-The Subject model (which drives the subject filter on the browse page and the course dropdown on the upload form) is intentionally restricted to admin management only. Sellers cannot create new subjects or courses through the site interface — they can only select from the existing taxonomy when uploading a document.
+The Subject model is intentionally restricted to admin management only. Sellers cannot create new subjects or courses through the site interface — they can only select from the existing taxonomy when uploading a document.
 
 This was a deliberate architectural decision for the following reasons:
 
 - **Data integrity:** Allowing users to freely create subjects would result in duplicates, misspellings and inconsistent categorisation (e.g. "Maths", "Mathematics", "Math" all appearing as separate subjects).
 - **Taxonomy control:** The subject list represents the core organisational structure of the marketplace. Keeping it admin-controlled ensures it remains clean, consistent and meaningful for buyers browsing by subject.
-- **Scope:** For the purposes of this project, the predefined subjects (Biology, Economics, History, Law, Mathematics, Psychology) cover the core academic domains. New subjects can be added by a site administrator via the Django admin panel at `/admin/` as the platform grows.
+- **Scope:** For the purposes of this project, the predefined subjects (Biology, Economics, History, Law, Mathematics, Psychology) cover the core academic domains. New subjects can be added by a site administrator via `/admin/` as the platform grows.
 
 This is consistent with how real academic marketplaces manage their category taxonomies — categories are curated by the platform, not crowdsourced from sellers.
 
+---
+
 ## Future Implementations
 
-- ***
+- Seller earnings dashboard showing total revenue and per-document sales counts
+- Seller response to reviews
+- Document tags for finer-grained filtering (e.g. "exam-style", "summary", "diagrams")
+- Email notifications on purchase
+- Subscription tier for buyers with unlimited access
+- Verified seller badges based on review ratings
+
+---
 
 ## Credits
 
 ### Content
 
+All document titles, descriptions and preview text in the seed data were generated using the [Faker](https://faker.readthedocs.io/) Python library.
+
 ### Media
+
+Subject thumbnail images and hero image were generated using [Google ImageFX](https://labs.google/fx/tools/image-fx) with custom prompts designed to match the StudyMarket teal/amber colour palette.
 
 ### Design Tools
 
+- [Bootstrap Icons](https://icons.getbootstrap.com/) — icon library used throughout the UI
+
 ### Code
 
-_(Attribution for any external tutorials, docs, or library references used — required by the assignment spec.)_
+- [Django documentation](https://docs.djangoproject.com/en/5.2/) — referenced throughout for ORM, views, forms, authentication and deployment
+- [Stripe documentation](https://stripe.com/docs) — referenced for PaymentIntent flow, Stripe.js card element and webhook event handling
+- [Whitenoise documentation](https://whitenoise.readthedocs.io/) — referenced for static file configuration
+- [Cloudinary documentation](https://cloudinary.com/documentation/django_integration) — referenced for media storage configuration
+- Bootstrap 5 CDN components used for grid, navbar, cards, forms and pagination
 
-### Tools & Platforms
+### Tools and Platforms
+
+- [GitHub](https://github.com) — version control and repository hosting
+- [Heroku](https://heroku.com) — cloud deployment platform
+- [Neon](https://neon.tech) — serverless PostgreSQL hosting
+- [Cloudinary](https://cloudinary.com) — cloud media storage
+- [Stripe](https://stripe.com) — payment processing
 
 ### Acknowledgements
+
+_(To be completed.)_
