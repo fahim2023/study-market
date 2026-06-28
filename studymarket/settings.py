@@ -150,6 +150,7 @@ CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
     "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
     "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    "STATICFILES_MANIFEST_ROOT": BASE_DIR / "staticfiles",
 }
 
 
@@ -168,7 +169,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-LOGIN_REDIRECT_URL = "documents:browse"
+LOGIN_REDIRECT_URL = "home:home"
 LOGOUT_REDIRECT_URL = "accounts:login"
 
 
