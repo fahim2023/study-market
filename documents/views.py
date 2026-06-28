@@ -130,3 +130,24 @@ def edit_document(request, slug):
             "document": document,
         },
     )
+
+
+@login_required
+def delete_document(request, slug):
+    """
+    Allows sellers to delete their own documents.
+    """
+    document = get_object_or_404(Document, slug=slug, seller=request.user)
+
+    if request.method == "POST":
+        document.delete()
+        messages.success(request, "Your document has been deleted.")
+        return redirect("documents:seller_dashboard")
+
+    return render(
+        request,
+        "documents/delete_document.html",
+        {
+            "document": document,
+        },
+    )
