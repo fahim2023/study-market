@@ -24,6 +24,24 @@ def browse(request):
     if query:
         documents = documents.filter(title__icontains=query)
 
+    sort = request.GET.get("sort", "newest")
+    if sort == "price_asc":
+        documents = documents.order_by("price")
+    elif sort == "price_desc":
+        documents = documents.order_by("-price")
+    elif sort == "a_z":
+        documents = documents.order_by("title")
+    elif sort == "z_a":
+        documents = documents.order_by("-title")
+    elif sort == "top_rated":
+        from django.db.models import Avg
+
+        documents = documents.annotate(avg_rating=Avg("reviews__rating")).order_by(
+            "-avg_rating"
+        )
+    else:
+        documents = documents.order_by("-created_at")
+
     paginator = Paginator(documents, 12)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -34,6 +52,7 @@ def browse(request):
         "selected_subject": subject_slug,
         "query": query,
         "page_obj": page_obj,
+        "sort": sort,
     }
     return render(request, "documents/browse.html", context)
 

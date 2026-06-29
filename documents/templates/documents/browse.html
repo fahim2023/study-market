@@ -12,7 +12,7 @@
             <h2 class="h6 fw-bold mb-3">Filters</h2>
             <p class="text-muted small mb-3">Narrow your search</p>
 
-            <form method="GET">
+            <form method="GET" id="filter-form">
                 <h3 class="h6 fw-semibold mb-2">Subject</h3>
                 {% for subject in subjects %}
                 <div class="form-check mb-1">
@@ -52,6 +52,18 @@
                 <h1 class="h3 fw-bold mb-1">Browse Study Notes</h1>
                 <p class="text-muted mb-0">Discover top-rated academic resources from verified students.</p>
             </div>
+            <div class="d-flex align-items-center gap-2">
+    <label class="text-muted small mb-0" for="sort">Sort by:</label>
+    <select class="form-select form-select-sm" id="sort" name="sort" style="width: auto;"
+            onchange="this.form.submit()" form="filter-form">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Most Recent</option>
+        <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+        <option value="a_z" {% if sort == 'a_z' %}selected{% endif %}>A–Z</option>
+        <option value="z_a" {% if sort == 'z_a' %}selected{% endif %}>Z–A</option>
+        <option value="top_rated" {% if sort == 'top_rated' %}selected{% endif %}>Top Rated</option>
+    </select>
+</div>
         </div>
 
         {% if documents %}
