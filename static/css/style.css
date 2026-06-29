@@ -626,3 +626,45 @@ p {
     gap: 12px;
   }
 }
+/* ── Dashboard Icon Buttons ─────────────────────────────────────────────── */
+.btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: white;
+  color: var(--color-text);
+  font-size: 15px;
+  transition: all 0.15s ease;
+}
+
+.btn-icon:hover {
+  background-color: var(--color-primary-container);
+  border-color: var(--color-primary-container);
+  color: white;
+}
+
+.btn-icon-danger {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: white;
+  color: var(--color-error);
+  font-size: 15px;
+  transition: all 0.15s ease;
+}
+
+.btn-icon-danger:hover {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: white;
+}
