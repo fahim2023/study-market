@@ -417,49 +417,26 @@ Subject-specific photography is used for document card thumbnails throughout the
 
 ## Features
 
-### Navigation
-
-The sticky navbar includes the StudyMarket logo (links to homepage), Browse, Sell and My Purchases links (Sell and My Purchases visible to authenticated users only), a search bar that submits to the browse page, and Log in / Register buttons for anonymous users or Hi, username / Log out for authenticated users. On mobile the navbar collapses to a hamburger menu with a clean dropdown layout.
-
-### Homepage
-
-A multi-section landing page consisting of: a hero section with headline, subtext, Browse Notes and How it works CTAs, and a hero image with a floating "Top Rated Resource" badge; an Explore by Subject grid with Bootstrap Icons for each subject; a Featured Revision Guides section pulling the 6 most recent published documents with subject images, ratings and prices; a How StudyMarket Works section with two contrasting cards (light for buyers, teal for sellers) each with icon-led steps; and a CTA strip inviting users to get started or become a seller.
-
-### Browse and Filter
-
-A full document catalog with a sidebar filter (subject radio buttons, Apply Filters button, Clear filter link) and a responsive 3-column document grid. Each card shows a subject-specific thumbnail image with a locked overlay, subject badge, document title, seller name, star rating and price with a Buy Now button. Pagination shows 12 documents per page with smart ellipsis navigation. Search filters by title keyword and combines with subject filters via query parameters.
-
-### Document Detail (Locked / Unlocked States)
-
-The document detail page shows all users the breadcrumb, course badge, title, publish date, file type and a preview text card. The content below the preview is gated: unauthenticated users see a Log in to purchase button; authenticated but unpurchased users see a locked content card with a lock icon and Unlock for £X CTA linking to Stripe checkout; users who have purchased see a green "You have access" card with the full description and a Download Document button. The sidebar shows seller information, price and the appropriate action button. Below the main content, a reviews section shows all reviews with star ratings and comments, plus Edit/Delete buttons for the review author, and a Write a Review button for users who have purchased but not yet reviewed.
-
-### Upload Document
-
-A seller upload form at `/documents/seller/upload/` allowing authenticated users to upload a PDF document with title, course selection, price, preview text, full description and status (draft/published). File size is validated client-side and server-side — files over 10MB are rejected with a clear error message before the Cloudinary upload is attempted.
-
-### Checkout (Stripe)
-
-The Stripe checkout page renders a secure card input element (card number, expiry, CVC — postal code hidden for UK compatibility). On form submission, a POST request fetches a PaymentIntent `client_secret` from the server, which is used by `stripe.confirmCardPayment()` in `checkout.js` to process the payment. On success the user is redirected to the payment success page and a `Purchase` record is created. A Stripe webhook at `/payments/webhook/` provides server-side backup purchase recording for `payment_intent.succeeded` events, verified using the webhook signing secret.
-
-### Seller Dashboard
-
-A table view of all documents uploaded by the logged-in seller, showing title, subject, price, status badge, upload date and View/Edit/Delete action buttons. An Upload Notes button links to the upload form. Empty state shown when no documents have been uploaded.
-
-### My Purchases
-
-A list of all documents purchased by the logged-in buyer, showing subject badge, document title, purchase date, amount paid, and Download and View buttons for each purchase. Empty state shown with a Browse Notes CTA when no purchases exist.
-
-### Reviews
-
-Full CRUD for reviews on purchased documents. Add review form with radio-button star rating (1–5) and comment textarea, gated behind purchase check. Edit and delete forms with confirmation. Reviews displayed on the document detail page with reviewer username, date, star rating and comment. Edit/Delete buttons visible only to the review author.
-
-### Admin Panel
-
-Django admin registered for all models: Subject, Course, Document, DocumentTag, Purchase, Review and Profile. Each has appropriate `list_display`, `list_filter` and `search_fields` configured for efficient management.
-
-### Custom 404 Page
-
-A custom `404.html` template that extends `base.html`, showing a friendly "Page Not Found" message with a Back to Home button. Served automatically by Django when `DEBUG=False`.
+| #   | Feature                        | Description                                                                                                                                                                                                                                                                                                                              | Screenshot                                                                 |
+| --- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 1   | **Navigation**                 | Sticky navbar on every page. Anonymous users see Browse, search bar, Log in and Register. Authenticated users see Browse, Sell, My Purchases, username and Log out. Collapses to a hamburger menu on mobile. Logo links to homepage from any page.                                                                                       | ![](documentation/images/features/feature-01-homepage.png)                 |
+| 2   | **Homepage**                   | Multi-section landing page making the platform purpose immediately evident. Sections: hero with headline and CTAs; Explore by Subject grid with Bootstrap Icons; Featured Revision Guides showing 6 most recent documents with subject images, ratings and prices; How StudyMarket Works with contrasting buyer/seller cards; CTA strip. | ![](documentation/images/features/feature-01-homepage.png)                 |
+| 3   | **Browse**                     | Full document catalog with left sidebar filter panel and responsive 3-column grid. Each card shows subject thumbnail, locked overlay, subject badge, course level, title, seller name, star rating and price.                                                                                                                            | ![](documentation/images/features/feature-02-browse.png)                   |
+| 4   | **Filter by Subject**          | Sidebar radio buttons filter the catalog by subject. Filter persists across pagination pages and combines with sort and search.                                                                                                                                                                                                          | ![](documentation/images/features/feature-03-browse-filtered.png)          |
+| 5   | **Sort**                       | Dropdown to sort documents by Most Recent, Price Low to High, Price High to Low, A–Z, Z–A or Top Rated. Sort value persists across pagination and combines with subject filter and search.                                                                                                                                               | ![](documentation/images/features/feature-04-browse-sorted.png)            |
+| 6   | **Document Detail — Locked**   | Unauthenticated users and users who have not purchased see a locked content card with a lock icon and Unlock for £X CTA. The full document content and download link are not accessible.                                                                                                                                                 | ![](documentation/images/features/feature-05-document-detail-locked.png)   |
+| 7   | **Document Detail — Unlocked** | Users who have purchased see a green "You have access" card with the full description and a Download Document button. The sidebar mirrors the action. This locked/unlocked pairing is the core mechanic of the platform.                                                                                                                 | ![](documentation/images/features/feature-06-document-detail-unlocked.png) |
+| 8   | **Reviews on Detail Page**     | Reviews section on the document detail page shows all reviews with reviewer username, date, star rating and comment. Edit and Delete buttons visible only to the review author. Write a Review button shown only to buyers who have not yet reviewed.                                                                                    | ![](documentation/images/features/feature-07-reviews.png)                  |
+| 9   | **Stripe Checkout**            | Secure Stripe card input element (card number, expiry, CVC). On submission a POST fetches a PaymentIntent `client_secret` from the server. `checkout.js` calls `stripe.confirmCardPayment()` to process the payment. A Stripe webhook provides server-side backup purchase recording.                                                    | ![](documentation/images/features/feature-08-checkout.png)                 |
+| 10  | **Payment Success**            | Success page rendered after Stripe confirms payment. Purchase record is created in the database giving the buyer permanent access to the document.                                                                                                                                                                                       | ![](documentation/images/features/feature-09-payment-success.png)          |
+| 11  | **My Purchases**               | List of all documents purchased by the logged-in buyer. Each entry shows subject badge, title, purchase date, amount paid and Download and View buttons. Empty state shown with Browse Notes CTA when no purchases exist.                                                                                                                | ![](documentation/images/features/feature-10-my-purchases.png)             |
+| 12  | **Seller Dashboard**           | Table of all documents uploaded by the logged-in seller. Each row shows title, subject, price, status badge, upload date and View, Edit and Delete action buttons. Sellers can only manage their own documents — accessing another seller's edit or delete URL returns a 404.                                                            | ![](documentation/images/features/feature-11-seller-dashboard.png)         |
+| 13  | **Upload Document**            | Seller upload form with title, course dropdown, price, preview text, full description, file upload and draft/published status. File size validated server-side — files over 10MB rejected with a clear error message before Cloudinary upload is attempted.                                                                              | ![](documentation/images/features/feature-12-upload.png)                   |
+| 14  | **Add Review**                 | Write a Review button appears on the document detail page only for users who have purchased and not yet reviewed. Form features radio-button star rating (1–5) and comment textarea. Users cannot review a document they have not purchased.                                                                                             | ![](documentation/images/features/feature-13-add-review.png)               |
+| 15  | **Register**                   | Custom register page collecting username, email, password and password confirmation with full Django validation. Only accessible to anonymous users — authenticated users are redirected to homepage.                                                                                                                                    | ![](documentation/images/features/feature-14-register.png)                 |
+| 16  | **Login**                      | Custom login page using Django's `AuthenticationForm`. Only accessible to anonymous users. After successful login, users are redirected to the homepage.                                                                                                                                                                                 | ![](documentation/images/features/feature-15-login.png)                    |
+| 17  | **Custom 404 Page**            | Custom `404.html` extending `base.html`, showing a friendly "Page Not Found" message with a large 404 heading in primary teal and a Back to Home button. Served automatically by Django when `DEBUG=False`.                                                                                                                              | ![](documentation/images/features/feature-16-404.png)                      |
+| 18  | **Django Admin Panel**         | Admin registered for all models: Subject, Course, Document, DocumentTag, Purchase, Review and Profile. Each has `list_display`, `list_filter` and `search_fields` configured. Sole interface for managing the subject and course taxonomy.                                                                                               | ![](documentation/images/features/feature-17-admin.png)                    |
 
 ---
 
@@ -1213,7 +1190,33 @@ git push heroku main
 
 ![Bug 21 after fix](documentation/images/bugs/bug-21-staticfiles-manifest-after.png)
 
----
+### Bug 22: Stripe secret key not set on Heroku causing checkout 500 error
+
+**Issue:** On the live Heroku site, clicking Pay on the checkout page returned a 500 Internal Server Error. The browser console showed the POST to `/payments/checkout/` returning a 500 status with an HTML error page instead of the expected JSON `client_secret`, causing a `SyntaxError: Unexpected token '<'`. Checking `heroku logs --tail` confirmed the root cause:
+
+```
+stripe._error.AuthenticationError: You did not provide an API key. You need to provide your API key in the Authorization header, using Bearer auth (e.g. 'Authorization: Bearer YOUR_SECRET_KEY').
+```
+
+**Cause:** The `STRIPE_SECRET_KEY` environment variable had not been set in Heroku's config vars. Locally the key is loaded from `env.py`, but `env.py` is in `.gitignore` and is never deployed to Heroku. Without it, `stripe.api_key` was set to an empty string in `payments/views.py` at module load time:
+
+```python
+stripe.api_key = settings.STRIPE_SECRET_KEY
+```
+
+When the checkout view then attempted to call `stripe.PaymentIntent.create()`, Stripe's API rejected the request with a 401 authentication error, which Django surfaced as an unhandled 500 Internal Server Error. The JS received an HTML error page instead of the expected JSON containing the `client_secret`, causing the browser console `SyntaxError`.
+
+This is the same class of issue as Bug 15 (missing `STRIPE_PUBLIC_KEY`) — every variable defined in `env.py` must also be set manually in Heroku's config vars. The public key controls client-side Stripe initialisation; the secret key controls server-side PaymentIntent creation. Both are required for the payment flow to work end to end on the live site.
+
+**Fix:** Set the Stripe secret key in Heroku config vars:
+
+```bash
+heroku config:set STRIPE_SECRET_KEY=sk_test_...
+```
+
+After the dyno restarted with the correct key, the checkout view successfully created a PaymentIntent, returned the `client_secret` as JSON, and the full payment flow completed correctly on the live Heroku site.
+
+## ![Bug 22 after fix](documentation/images/bugs/bug-22-stripe-secret-key-after.png)
 
 ## Design Decisions
 
