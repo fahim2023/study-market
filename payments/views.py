@@ -104,18 +104,34 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
+from courses.models import Subject
+
+
 @login_required
 def my_purchases(request):
     purchases = (
         Purchase.objects.filter(buyer=request.user)
-        .select_related("document", "document__course", "document__course__subject")
+        .select_related(
+            "document",
+            "document__course",
+            "document__course__subject",
+            "document__seller",
+        )
         .order_by("-created_at")
     )
 
-    return render(
-        request,
-        "payments/my_purchases.html",
-        {
-            "purchases": purchases,
-        },
-    )
+    reviewed_doc_ids = list(request.user.reviews.values_list("document_id", flat=True))
+
+    selected_subject = request.GET.get("subject")
+    if selected_subject:
+        purchases = purchases.filter(document__course__subject__slug=selected_subject)
+
+    subjects = Subject.objects.all()
+
+    context = {
+        "purchases": purchases,
+        "reviewed_doc_ids": reviewed_doc_ids,
+        "subjects": subjects,
+        "selected_subject": selected_subject,
+    }
+    return render(request, "payments/my_purchases.html", context)

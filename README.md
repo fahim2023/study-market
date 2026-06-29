@@ -1218,6 +1218,46 @@ After the dyno restarted with the correct key, the checkout view successfully cr
 
 ## ![Bug 22 after fix](documentation/images/bugs/bug-22-stripe-secret-key-after.png)
 
+### Bug 23: Edit document throwing 500 error when no new file uploaded
+
+**Issue:** Editing a document on the live Heroku site threw a 500 Internal Server Error whenever the form was submitted without uploading a new file. The Heroku logs showed the error occurring in `documents/forms.py` at the `clean_file` method:
+
+```
+File "/app/documents/forms.py", line 40, in clean_file
+if file and file.size > 10 * 1024 * 1024:
+TypeError: '>' not supported between instances of 'NoneType' and 'int'
+```
+
+![Bug 23 before fix](documentation/images/bugs/bug-23-edit-document-before.png)
+
+**Cause:** When editing a document without uploading a new file, Cloudinary returns a file object where `.size` is `None` rather than an integer. The `clean_file` validation method checked `if file and file.size > 10 * 1024 * 1024` — `file` was truthy (the Cloudinary object existed) but `file.size` was `None`, causing Python to throw a `TypeError` when comparing `None > int`. This only surfaced on Heroku because Cloudinary is only used in production — locally Django uses the filesystem storage backend where `.size` is always a valid integer.
+
+**Fix:** Wrapped the size check in a `try/except` block to handle the case where `file.size` is `None` or raises an `AttributeError`:
+
+```python
+def clean_file(self):
+    file = self.cleaned_data.get("file")
+    try:
+        if file and file.size and file.size > 10 * 1024 * 1024:
+            raise forms.ValidationError(
+                "File size must be under 10MB. Please compress your PDF and try again."
+            )
+    except (AttributeError, TypeError):
+        pass
+    return file
+```
+
+The `edit_document` view was also updated to preserve the existing file when no new file is uploaded:
+
+```python
+if not request.FILES.get('file'):
+    doc.file = document.file
+```
+
+After deploying, editing a document without re-uploading the file worked correctly and redirected to the seller dashboard with a success message.
+
+![Bug 23 after fix](documentation/images/bugs/bug-23-edit-document-after.png)
+
 ## Design Decisions
 
 ### Subject Management — Admin Only
