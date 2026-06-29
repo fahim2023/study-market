@@ -27,15 +27,26 @@
                 <form method="POST" novalidate>
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Log in</button>
+                    <button type="submit" class="btn btn-brown w-100 mt-3">Log in</button>
                 </form>
 
                 <hr class="my-4">
 
                 <p class="text-center text-muted mb-0">
                     Don't have an account?
-                    <a href="{% url 'accounts:register' %}" class="fw-bold">Create an account</a>
+                    <a href="{% url 'accounts:register' %}" class="auth-create-link fw-bold">Create an account</a>
                 </p>
+
+                <div class="d-flex gap-3 mt-4">
+                    <div class="auth-stat-card flex-fill text-center p-3">
+                        <div class="fw-bold">10k+</div>
+                        <div class="text-muted" style="font-size: 11px; letter-spacing: 0.05em;">VERIFIED NOTES</div>
+                    </div>
+                    <div class="auth-stat-card flex-fill text-center p-3">
+                        <div class="fw-bold"><span class="text-warning">★</span> 4.9/5</div>
+                        <div class="text-muted" style="font-size: 11px; letter-spacing: 0.05em;">AVG. RATING</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

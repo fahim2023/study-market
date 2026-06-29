@@ -143,6 +143,19 @@ p {
   border-color: var(--color-primary);
   color: white;
 }
+/* ── Brown Button ─────────────────────────────────────────────── */
+.btn-brown {
+  background-color: #8e4e14;
+  border-color: #8e4e14;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-brown:hover {
+  background-color: #783d01;
+  border-color: #783d01;
+  color: white;
+}
 
 /* ── Forms ─────────────────────────────────────────────── */
 .form-control,
@@ -173,6 +186,21 @@ p {
   justify-content: center;
   margin-left: auto;
   margin-right: auto;
+}
+.auth-create-link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.auth-create-link:hover {
+  color: var(--color-primary-container);
+  text-decoration: underline;
+}
+
+.auth-stat-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
 }
 
 /* ── Document Cards ─────────────────────────────────────────────── */

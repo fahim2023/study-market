@@ -27,14 +27,14 @@
                 <form method="POST" novalidate>
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Create account</button>
+                    <button type="submit" class="btn btn-brown w-100 mt-3">Create account</button>
                 </form>
 
                 <hr class="my-4">
 
                 <p class="text-center text-muted mb-0">
                     Already have an account?
-                    <a href="{% url 'accounts:login' %}" class="fw-bold">Log in</a>
+                    <a href="{% url 'accounts:login' %}" class="auth-create-link fw-bold">Log in</a>
                 </p>
             </div>
         </div>
