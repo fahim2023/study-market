@@ -46,6 +46,16 @@ def browse(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    purchased_ids = []
+    if request.user.is_authenticated:
+        from payments.models import Purchase
+
+        purchased_ids = list(
+            Purchase.objects.filter(buyer=request.user).values_list(
+                "document_id", flat=True
+            )
+        )
+
     context = {
         "documents": page_obj,
         "subjects": subjects,
@@ -53,6 +63,7 @@ def browse(request):
         "query": query,
         "page_obj": page_obj,
         "sort": sort,
+        "purchased_ids": purchased_ids,
     }
     return render(request, "documents/browse.html", context)
 
