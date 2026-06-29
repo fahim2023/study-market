@@ -38,6 +38,26 @@
 
                 <hr>
 
+                <h3 class="h6 fw-semibold mb-2">Sort by</h3>
+                <div class="dropdown mb-3">
+                    <button class="btn btn-outline-secondary btn-sm w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if sort == 'price_asc' %}Price: Low to High
+                        {% elif sort == 'price_desc' %}Price: High to Low
+                        {% elif sort == 'a_z' %}A–Z
+                        {% elif sort == 'z_a' %}Z–A
+                        {% elif sort == 'top_rated' %}Top Rated
+                        {% else %}Most Recent{% endif %}
+                    </button>
+                    <ul class="dropdown-menu w-100">
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=newest">Most Recent</a></li>
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=price_asc">Price: Low to High</a></li>
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=price_desc">Price: High to Low</a></li>
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=a_z">A–Z</a></li>
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=z_a">Z–A</a></li>
+                        <li><a class="dropdown-item small" href="?{% if selected_subject %}subject={{ selected_subject }}&{% endif %}sort=top_rated">Top Rated</a></li>
+                    </ul>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 btn-sm">
                     Apply Filters
                 </button>
@@ -51,18 +71,6 @@
             <div>
                 <h1 class="h3 fw-bold mb-1">Browse Study Notes</h1>
                 <p class="text-muted mb-0">Discover top-rated academic resources from verified students.</p>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <label class="text-muted small mb-0" for="sort">Sort by:</label>
-                <select class="form-select form-select-sm" id="sort" name="sort"
-                        style="width: auto;" onchange="this.form.submit()" form="filter-form">
-                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Most Recent</option>
-                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-                    <option value="a_z" {% if sort == 'a_z' %}selected{% endif %}>A–Z</option>
-                    <option value="z_a" {% if sort == 'z_a' %}selected{% endif %}>Z–A</option>
-                    <option value="top_rated" {% if sort == 'top_rated' %}selected{% endif %}>Top Rated</option>
-                </select>
             </div>
         </div>
 

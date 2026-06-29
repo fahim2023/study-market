@@ -34,11 +34,12 @@ def browse(request):
     elif sort == "z_a":
         documents = documents.order_by("-title")
     elif sort == "top_rated":
-        from django.db.models import Avg
+        from django.db.models import Avg, Value
+        from django.db.models.functions import Coalesce
 
-        documents = documents.annotate(avg_rating=Avg("reviews__rating")).order_by(
-            "-avg_rating"
-        )
+        documents = documents.annotate(
+            avg_rating=Coalesce(Avg("reviews__rating"), Value(0.0))
+        ).order_by("-avg_rating")
     else:
         documents = documents.order_by("-created_at")
 
