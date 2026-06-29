@@ -129,15 +129,15 @@ def upload_document(request):
 
 @login_required
 def edit_document(request, slug):
-    """
-    Allows sellers to edit their own documents.
-    """
     document = get_object_or_404(Document, slug=slug, seller=request.user)
 
     if request.method == "POST":
         form = DocumentForm(request.POST, request.FILES, instance=document)
         if form.is_valid():
-            form.save()
+            doc = form.save(commit=False)
+            if not request.FILES.get("file"):
+                doc.file = document.file
+            doc.save()
             messages.success(request, "Your document has been updated.")
             return redirect("documents:seller_dashboard")
     else:

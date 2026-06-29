@@ -35,6 +35,10 @@ class DocumentForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["file"].required = False
+
     def clean_file(self):
         file = self.cleaned_data.get("file")
         if file and hasattr(file, "size") and file.size > 10 * 1024 * 1024:
