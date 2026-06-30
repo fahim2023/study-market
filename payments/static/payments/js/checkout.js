@@ -1,3 +1,5 @@
+/* jshint esversion: 8 */
+/* global Stripe */
 const stripeData = document.getElementById("stripe-data");
 const publicKey = stripeData.dataset.publicKey;
 const clientSecret = stripeData.dataset.clientSecret;

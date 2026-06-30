@@ -820,19 +820,58 @@ _(User story → test → expected → actual → pass/fail table — to be comp
 
 #### HTML Validation
 
-_(W3C validator results — to be completed.)_
+All pages were validated using the [W3C Nu HTML Checker](https://validator.w3.org/nu/). Public pages were validated via direct URL. Pages requiring authentication were validated by copying the page source and pasting into the text input validator.
+
+One issue was identified and fixed during validation: the Add Review page had a heading hierarchy starting at `<h2>` with no preceding `<h1>`. This was corrected by changing the heading to `<h1>` with Bootstrap's `h2` class applied to maintain visual size. The footer column headings were also changed from `<h3>` to `<h2>` to avoid skipping heading levels after the page `<h1>`.
+
+| Page             | Method      | Result    | Screenshot                                                                  |
+| ---------------- | ----------- | --------- | --------------------------------------------------------------------------- |
+| Homepage         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-homepage.png)         |
+| Browse           | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-browse.png)           |
+| Document Detail  | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-document-detail.png)  |
+| Login            | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-login.png)            |
+| Register         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-register.png)         |
+| 404 Page         | Page source | No errors | ![](documentation/images/testing/validation/html/html-404.png)              |
+| My Purchases     | Page source | No errors | ![](documentation/images/testing/validation/html/html-my-purchases.png)     |
+| Seller Dashboard | Page source | No errors | ![](documentation/images/testing/validation/html/html-seller-dashboard.png) |
+| Upload Document  | Page source | No errors | ![](documentation/images/testing/validation/html/html-upload.png)           |
+| Checkout         | Page source | No errors | ![](documentation/images/testing/validation/html/html-checkout.png)         |
+| Add Review       | Page source | No errors | ![](documentation/images/testing/validation/html/html-add-review.png)       |
 
 #### CSS Validation
 
-_(Jigsaw validator results — to be completed.)_
+The CSS file `static/css/style.css` was validated using the [W3C CSS Validator (Jigsaw)](https://jigsaw.w3.org/css-validator/) via direct input. No errors were found.
+
+18 warnings were returned, all of which are expected and acceptable:
+
+- **CSS variables not statically checked** — the validator cannot evaluate `var()` custom properties at validation time. This is a known limitation of the validator and not an indication of any issue with the code.
+- **Same colour for `background-color` and `border-color`** — intentional in the button design system where border and background match to create solid filled buttons.
+
+![CSS Validation](documentation/images/testing/validation/css/css-validation.png)
 
 #### Python PEP8 Validation
 
 _(CI Python Linter results — to be completed.)_
 
-#### JavaScript
+#### JavaScript Validation
 
-_(JSHint results for `checkout.js` — to be completed.)_
+Both JavaScript files were validated using [JSHint](https://jshint.com/).
+
+**`checkout.js`**
+
+`/* jshint esversion: 8 */` and `/* global Stripe */` were added to the top of the file to inform JSHint that ES8 syntax is intentional and that `Stripe` is a global variable loaded from the Stripe.js CDN. After adding these directives, one warning remained:
+
+- **`clientSecret` unused variable** — this variable is declared but used indirectly via `data.client_secret` from the POST response. It is not a real issue and does not affect functionality.
+
+No errors were found.
+
+![JS Checkout Validation](documentation/images/testing/validation/js/js-checkout.png)
+
+**`alerts.js`**
+
+No errors or warnings found.
+
+![JS Alerts Validation](documentation/images/testing/validation/js/js-alerts.png)
 
 #### Lighthouse
 
