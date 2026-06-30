@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 import sys
+from django.contrib.messages import constants as messages
 
 if os.path.isfile("env.py"):
     import env
@@ -190,3 +191,7 @@ STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 X_FRAME_OPTIONS = "ALLOWALL"
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}
