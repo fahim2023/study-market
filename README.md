@@ -1,6 +1,6 @@
 # StudyMarket
 
-![StudyMarket on all devices](documentation/images/amiresponsive.webp)
+![StudyMarket on all devices](documentation/images/amiresponsive.png)
 
 [StudyMarket](#) is a full-stack academic marketplace built with Django, where students buy and sell revision notes, past-paper solutions and study guides. Free users can preview a teaser of each document; the full content unlocks immediately after a secure Stripe payment.
 
@@ -179,17 +179,33 @@ Test-Driven Development was applied to the model and view layer: automated tests
 
 ### Wireframes
 
-_(Desktop/mobile wireframes per key page — Browse, Document Detail, Upload, Seller Dashboard, My Purchases.)_
+Wireframes were created prior to development to plan the layout and user flow of the key pages. The wireframes informed the final design but some details evolved during development.
 
----
+**Homepage**
+![Homepage Wireframe](documentation/images/wireframes/wireframe-homepage.png)
+
+**Browse**
+![Browse Wireframe](documentation/images/wireframes/wireframe-browse.png)
+
+**My Purchases**
+![My Purchases Wireframe](documentation/images/wireframes/wireframe-my-purchases.png)
+
+**Seller Dashboard**
+![Seller Dashboard Wireframe](documentation/images/wireframes/wireframe-seller-dashboard.png)
+
+**Upload Document**
+![Upload Wireframe](documentation/images/wireframes/wireframe-upload.png)
+
+**Login / Register**
+![Login Wireframe](documentation/images/wireframes/wireframe-login.png)
 
 ## Database Design
 
 ### ERD
 
-_(Entity Relationship Diagram image — to be added once finalised.)_
+The Entity Relationship Diagram below shows the relationships between all models in the StudyMarket database.
 
----
+![ERD](documentation/images/erd.png)
 
 ### Database Schema
 
@@ -404,40 +420,40 @@ The single most important UI pattern on the site, since it's the visual proof of
 
 Subject-specific photography is used for document card thumbnails throughout the browse page and homepage featured section. Images were generated using Google ImageFX with prompts designed to match the teal/amber colour palette of the site. Images used:
 
-- `hero_image.webp` — laptop on teal desk, hero section
-- `biology.webp` — biology textbooks and microscope on teal surface
-- `economics.webp` — economics textbook with charts and graphs
-- `history.webp` — vintage maps and handwritten notes on teal desk
-- `law.webp` — open law textbook with case notes
-- `math.webp` — mathematics notebook with equations and calculator
-- `psychology.webp` — psychology textbooks with brain diagrams
-- `general.webp` — general study notes and sticky notes on teal desk
+- `hero_image.png` — laptop on teal desk, hero section
+- `biology.png` — biology textbooks and microscope on teal surface
+- `economics.png` — economics textbook with charts and graphs
+- `history.png` — vintage maps and handwritten notes on teal desk
+- `law.png` — open law textbook with case notes
+- `math.png` — mathematics notebook with equations and calculator
+- `psychology.png` — psychology textbooks with brain diagrams
+- `general.png` — general study notes and sticky notes on teal desk
 
 ---
 
 ## Features
 
-| #   | Feature                        | Description                                                                                                                                                                                                                                                                                                                                                                                                   | Screenshot                                                                                          |
-| --- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| 1   | **Navigation**                 | Sticky navbar on every page. Anonymous users see Browse, search bar, Log in and Register. Authenticated users see Browse, Sell, My Purchases, username and Log out. Collapses to a hamburger menu on mobile. Logo links to homepage from any page.                                                                                                                                                            | ![Navigation](documentation/images/features/feature-01-homepage.webp)                               |
-| 2   | **Homepage**                   | Multi-section landing page making the platform purpose immediately evident. Sections: hero with headline and CTAs; Explore by Subject grid with Bootstrap Icons; Featured Revision Guides showing 6 most recent documents with subject images, ratings and prices; How StudyMarket Works with contrasting buyer/seller cards; CTA strip. Purchased documents show without the locked overlay.                 | ![Homepage](documentation/images/features/feature-01-homepage.webp)                                 |
-| 3   | **Browse**                     | Full document catalog with left sidebar filter panel and responsive 3-column grid. Each card shows subject thumbnail, locked overlay for unpurchased documents, subject badge, course level, title, seller name, star rating and price. Purchased documents show a View button instead of Buy Now with no locked overlay.                                                                                     | ![Browse](documentation/images/features/feature-02-browse.webp)                                     |
-| 4   | **Filter by Subject**          | Sidebar radio buttons filter the catalog by subject. Filter persists across pagination and combines with sort. Clear filter link removes the active filter.                                                                                                                                                                                                                                                   | ![Browse filtered](documentation/images/features/feature-03-browse-filtered.webp)                   |
-| 5   | **Sort**                       | Bootstrap dropdown in sidebar to sort documents by Most Recent, Price Low to High, Price High to Low, A–Z, Z–A or Top Rated. Sort value persists across pagination and combines with subject filter.                                                                                                                                                                                                          | ![Browse sorted](documentation/images/features/feature-04-browse-sorted.webp)                       |
-| 6   | **Document Detail — Locked**   | Unauthenticated users and users who have not purchased see a locked content card with a lock icon and Unlock for £X CTA. The full document content, description and download link are not accessible. Anonymous users see a Log in to purchase button.                                                                                                                                                        | ![Document detail locked](documentation/images/features/feature-05-document-detail-locked.webp)     |
-| 7   | **Document Detail — Unlocked** | Users who have purchased see a green "You have access" card with the full description and a Download Document button. The sidebar also shows a Download button. This locked/unlocked pairing is the core mechanic of the platform and is visually clear to any examiner.                                                                                                                                      | ![Document detail unlocked](documentation/images/features/feature-06-document-detail-unlocked.webp) |
-| 8   | **Reviews**                    | Reviews section on the document detail page shows all reviews with reviewer username, date, star rating rendered as filled/empty stars and comment. Edit and Delete buttons visible only to the review author. Write a Review button shown only to buyers who have purchased but not yet reviewed.                                                                                                            | ![Reviews](documentation/images/features/feature-07-reviews.webp)                                   |
-| 9   | **Stripe Checkout**            | Secure Stripe card input element (card number, expiry, CVC — postal code hidden for UK compatibility). On submission a POST fetches a PaymentIntent `client_secret` from the server. `checkout.js` calls `stripe.confirmCardPayment()` to process the payment client-side. A Stripe webhook at `/payments/webhook/` provides server-side backup purchase recording verified using the webhook signing secret. | ![Checkout](documentation/images/features/feature-08-checkout.webp)                                 |
-| 10  | **Payment Success**            | Success page rendered after Stripe confirms payment. Purchase record is created in the database giving the buyer permanent access to the document. Clear confirmation message shown to the user.                                                                                                                                                                                                              | ![Payment success](documentation/images/features/feature-09-payment-success.webp)                   |
-| 11  | **My Purchases**               | Grid of all documents purchased by the logged-in buyer. Each card shows subject thumbnail, subject badge, title, seller name, View Now and PDF download buttons. A Leave a Review button appears for documents not yet reviewed. Subject filter in the sidebar narrows the library. Empty state shown with Browse Notes CTA when no purchases exist.                                                          | ![My Purchases](documentation/images/features/feature-10-my-purchases.webp)                         |
-| 12  | **Seller Dashboard**           | Table of all documents uploaded by the logged-in seller. Each row shows title, subject badge, price, published/draft status badge, upload date and icon action buttons — eye (view), pencil (edit), trash (delete). Empty state shown with Upload CTA. Sellers can only manage their own documents.                                                                                                           | ![Seller Dashboard](documentation/images/features/feature-11-seller-dashboard.webp)                 |
-| 13  | **Upload Document**            | Seller upload form with title, course dropdown, price, preview text, full description, PDF file upload and draft/published status. File size validated server-side — files over 10MB rejected with a clear error message before Cloudinary upload is attempted.                                                                                                                                               | ![Upload](documentation/images/features/feature-12-upload.webp)                                     |
-| 14  | **Add Review**                 | Write a Review form with radio-button star rating (1–5) and comment textarea. Only accessible to buyers who have purchased the document and not yet reviewed it. Users who have not purchased are redirected away.                                                                                                                                                                                            | ![Add Review](documentation/images/features/feature-13-add-review.webp)                             |
-| 15  | **Register**                   | Custom register page with StudyMarket logo badge, username, email, password and password confirmation fields. Help text removed for a clean UI. Only accessible to anonymous users — authenticated users are redirected to homepage.                                                                                                                                                                          | ![Register](documentation/images/features/feature-14-register.webp)                                 |
-| 16  | **Login**                      | Custom login page with StudyMarket logo badge, username and password fields, and social proof stats (10k+ verified notes, 4.9/5 avg rating). Only accessible to anonymous users. After successful login users are redirected to the homepage.                                                                                                                                                                 | ![Login](documentation/images/features/feature-15-login.webp)                                       |
-| 17  | **Auto-dismiss Alerts**        | Success and error messages (e.g. "Your document has been updated", "Welcome back") auto-dismiss after 3 seconds with a fade-out transition, implemented in `static/js/alerts.js`.                                                                                                                                                                                                                             | ![Alerts](documentation/images/features/feature-01-homepage.webp)                                   |
-| 18  | **Custom 404 Page**            | Custom `404.html` extending `base.html`, showing a friendly "Page Not Found" message with a Back to Home button. Served automatically by Django when `DEBUG=False` on Heroku.                                                                                                                                                                                                                                 | ![404](documentation/images/features/feature-16-404.webp)                                           |
-| 19  | **Django Admin Panel**         | Admin registered for all models: Subject, Course, Document, DocumentTag, Purchase, Review and Profile. Each has `list_display`, `list_filter` and `search_fields` configured. Sole interface for managing the subject and course taxonomy.                                                                                                                                                                    | ![Admin](documentation/images/features/feature-17-admin.webp)                                       |
+| #   | Feature                        | Description                                                                                                                                                                                                                                                                                                                                                                                                   | Screenshot                                                                                         |
+| --- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 1   | **Navigation**                 | Sticky navbar on every page. Anonymous users see Browse, search bar, Log in and Register. Authenticated users see Browse, Sell, My Purchases, username and Log out. Collapses to a hamburger menu on mobile. Logo links to homepage from any page.                                                                                                                                                            | ![Navigation](documentation/images/features/feature-01-homepage.png)                               |
+| 2   | **Homepage**                   | Multi-section landing page making the platform purpose immediately evident. Sections: hero with headline and CTAs; Explore by Subject grid with Bootstrap Icons; Featured Revision Guides showing 6 most recent documents with subject images, ratings and prices; How StudyMarket Works with contrasting buyer/seller cards; CTA strip. Purchased documents show without the locked overlay.                 | ![Homepage](documentation/images/features/feature-01-homepage.png)                                 |
+| 3   | **Browse**                     | Full document catalog with left sidebar filter panel and responsive 3-column grid. Each card shows subject thumbnail, locked overlay for unpurchased documents, subject badge, course level, title, seller name, star rating and price. Purchased documents show a View button instead of Buy Now with no locked overlay.                                                                                     | ![Browse](documentation/images/features/feature-02-browse.png)                                     |
+| 4   | **Filter by Subject**          | Sidebar radio buttons filter the catalog by subject. Filter persists across pagination and combines with sort. Clear filter link removes the active filter.                                                                                                                                                                                                                                                   | ![Browse filtered](documentation/images/features/feature-03-browse-filtered.png)                   |
+| 5   | **Sort**                       | Bootstrap dropdown in sidebar to sort documents by Most Recent, Price Low to High, Price High to Low, A–Z, Z–A or Top Rated. Sort value persists across pagination and combines with subject filter.                                                                                                                                                                                                          | ![Browse sorted](documentation/images/features/feature-04-browse-sorted.png)                       |
+| 6   | **Document Detail — Locked**   | Unauthenticated users and users who have not purchased see a locked content card with a lock icon and Unlock for £X CTA. The full document content, description and download link are not accessible. Anonymous users see a Log in to purchase button.                                                                                                                                                        | ![Document detail locked](documentation/images/features/feature-05-document-detail-locked.png)     |
+| 7   | **Document Detail — Unlocked** | Users who have purchased see a green "You have access" card with the full description and a Download Document button. The sidebar also shows a Download button. This locked/unlocked pairing is the core mechanic of the platform and is visually clear to any examiner.                                                                                                                                      | ![Document detail unlocked](documentation/images/features/feature-06-document-detail-unlocked.png) |
+| 8   | **Reviews**                    | Reviews section on the document detail page shows all reviews with reviewer username, date, star rating rendered as filled/empty stars and comment. Edit and Delete buttons visible only to the review author. Write a Review button shown only to buyers who have purchased but not yet reviewed.                                                                                                            | ![Reviews](documentation/images/features/feature-07-reviews.png)                                   |
+| 9   | **Stripe Checkout**            | Secure Stripe card input element (card number, expiry, CVC — postal code hidden for UK compatibility). On submission a POST fetches a PaymentIntent `client_secret` from the server. `checkout.js` calls `stripe.confirmCardPayment()` to process the payment client-side. A Stripe webhook at `/payments/webhook/` provides server-side backup purchase recording verified using the webhook signing secret. | ![Checkout](documentation/images/features/feature-08-checkout.png)                                 |
+| 10  | **Payment Success**            | Success page rendered after Stripe confirms payment. Purchase record is created in the database giving the buyer permanent access to the document. Clear confirmation message shown to the user.                                                                                                                                                                                                              | ![Payment success](documentation/images/features/feature-09-payment-success.png)                   |
+| 11  | **My Purchases**               | Grid of all documents purchased by the logged-in buyer. Each card shows subject thumbnail, subject badge, title, seller name, View Now and PDF download buttons. A Leave a Review button appears for documents not yet reviewed. Subject filter in the sidebar narrows the library. Empty state shown with Browse Notes CTA when no purchases exist.                                                          | ![My Purchases](documentation/images/features/feature-10-my-purchases.png)                         |
+| 12  | **Seller Dashboard**           | Table of all documents uploaded by the logged-in seller. Each row shows title, subject badge, price, published/draft status badge, upload date and icon action buttons — eye (view), pencil (edit), trash (delete). Empty state shown with Upload CTA. Sellers can only manage their own documents.                                                                                                           | ![Seller Dashboard](documentation/images/features/feature-11-seller-dashboard.png)                 |
+| 13  | **Upload Document**            | Seller upload form with title, course dropdown, price, preview text, full description, PDF file upload and draft/published status. File size validated server-side — files over 10MB rejected with a clear error message before Cloudinary upload is attempted.                                                                                                                                               | ![Upload](documentation/images/features/feature-12-upload.png)                                     |
+| 14  | **Add Review**                 | Write a Review form with radio-button star rating (1–5) and comment textarea. Only accessible to buyers who have purchased the document and not yet reviewed it. Users who have not purchased are redirected away.                                                                                                                                                                                            | ![Add Review](documentation/images/features/feature-13-add-review.png)                             |
+| 15  | **Register**                   | Custom register page with StudyMarket logo badge, username, email, password and password confirmation fields. Help text removed for a clean UI. Only accessible to anonymous users — authenticated users are redirected to homepage.                                                                                                                                                                          | ![Register](documentation/images/features/feature-14-register.png)                                 |
+| 16  | **Login**                      | Custom login page with StudyMarket logo badge, username and password fields, and social proof stats (10k+ verified notes, 4.9/5 avg rating). Only accessible to anonymous users. After successful login users are redirected to the homepage.                                                                                                                                                                 | ![Login](documentation/images/features/feature-15-login.png)                                       |
+| 17  | **Auto-dismiss Alerts**        | Success and error messages (e.g. "Your document has been updated", "Welcome back") auto-dismiss after 3 seconds with a fade-out transition, implemented in `static/js/alerts.js`.                                                                                                                                                                                                                             | ![Alerts](documentation/images/features/feature-01-homepage.png)                                   |
+| 18  | **Custom 404 Page**            | Custom `404.html` extending `base.html`, showing a friendly "Page Not Found" message with a Back to Home button. Served automatically by Django when `DEBUG=False` on Heroku.                                                                                                                                                                                                                                 | ![404](documentation/images/features/feature-16-404.png)                                           |
+| 19  | **Django Admin Panel**         | Admin registered for all models: Subject, Course, Document, DocumentTag, Purchase, Review and Profile. Each has `list_display`, `list_filter` and `search_fields` configured. Sole interface for managing the subject and course taxonomy.                                                                                                                                                                    | ![Admin](documentation/images/features/feature-17-admin.png)                                       |
 
 ## Technologies Used
 
@@ -756,30 +772,30 @@ All automated tests use Django's built-in testing framework. Tests run against a
 
 #### accounts app
 
-| Test                                                  | Description                                                                    | Result | Screenshot                                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------ | ------ | ---------------------------------------------------------------------------- |
-| `test_profile_created_automatically_on_user_creation` | A Profile is created automatically via signal when a new User registers        | Pass   | ![](documentation/images/testing/test-accounts-profile-created-pass.webp)    |
-| `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                          | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.webp) |
-| `test_subject_slug_auto_generated`                    | Subject slug is auto-generated from the subject name on save                   | Pass   | ![](documentation/images/testing/test-courses-subject-slug-pass.webp)        |
-| `test_course_slug_auto_generated`                     | Course slug is auto-generated from subject name, course name and level on save | Pass   | ![](documentation/images/testing/test-courses-course-slug-pass.webp)         |
-| `test_tag_str_returns_name`                           | DocumentTag string representation returns the tag name                         | Pass   | ![](documentation/images/testing/test-documents-tag-str-pass.webp)           |
-| `test_document_slug_auto_generated`                   | Document slug is auto-generated from the title on save                         | Pass   | ![](documentation/images/testing/test-documents-slug-pass.webp)              |
+| Test                                                  | Description                                                                    | Result | Screenshot                                                                  |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------- |
+| `test_profile_created_automatically_on_user_creation` | A Profile is created automatically via signal when a new User registers        | Pass   | ![](documentation/images/testing/test-accounts-profile-created-pass.png)    |
+| `test_new_profile_defaults_to_not_a_seller`           | A newly created Profile defaults `is_seller` to False                          | Pass   | ![](documentation/images/testing/test-accounts-default-not-seller-pass.png) |
+| `test_subject_slug_auto_generated`                    | Subject slug is auto-generated from the subject name on save                   | Pass   | ![](documentation/images/testing/test-courses-subject-slug-pass.png)        |
+| `test_course_slug_auto_generated`                     | Course slug is auto-generated from subject name, course name and level on save | Pass   | ![](documentation/images/testing/test-courses-course-slug-pass.png)         |
+| `test_tag_str_returns_name`                           | DocumentTag string representation returns the tag name                         | Pass   | ![](documentation/images/testing/test-documents-tag-str-pass.png)           |
+| `test_document_slug_auto_generated`                   | Document slug is auto-generated from the title on save                         | Pass   | ![](documentation/images/testing/test-documents-slug-pass.png)              |
 
 #### payments app
 
-| Test                                | Description                                                                                                                       | Result  | Screenshot                                              |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------- |
-| `test_purchase_str`                 | Purchase `__str__` returns correct format `buyer → document title`                                                                | ✅ Pass | ![](documentation/images/testing/payments-test-01.webp) |
-| `test_duplicate_purchase_prevented` | Attempting to create a duplicate Purchase for the same buyer and document raises an exception due to `unique_together` constraint | ✅ Pass | ![](documentation/images/testing/payments-test-02.webp) |
-| `test_checkout_requires_login`      | Unauthenticated users attempting to access the checkout page are redirected to the login page with a 302 response                 | ✅ Pass | ![](documentation/images/testing/payments-test-03.webp) |
+| Test                                | Description                                                                                                                       | Result  | Screenshot                                             |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------ |
+| `test_purchase_str`                 | Purchase `__str__` returns correct format `buyer → document title`                                                                | ✅ Pass | ![](documentation/images/testing/payments-test-01.png) |
+| `test_duplicate_purchase_prevented` | Attempting to create a duplicate Purchase for the same buyer and document raises an exception due to `unique_together` constraint | ✅ Pass | ![](documentation/images/testing/payments-test-02.png) |
+| `test_checkout_requires_login`      | Unauthenticated users attempting to access the checkout page are redirected to the login page with a 302 response                 | ✅ Pass | ![](documentation/images/testing/payments-test-03.png) |
 
 #### reviews app
 
-| Test                                  | Description                                                                                              | Result  | Screenshot                                             |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------ |
-| `test_review_str`                     | Review `__str__` returns correct format `reviewer — document title (rating★)`                            | ✅ Pass | ![](documentation/images/testing/reviews-test-01.webp) |
-| `test_unpurchased_user_cannot_review` | A user who has not purchased a document is redirected away from the review form and no review is created | ✅ Pass | ![](documentation/images/testing/reviews-test-02.webp) |
-| `test_purchased_user_can_review`      | A user who has purchased a document can successfully submit a review which is saved to the database      | ✅ Pass | ![](documentation/images/testing/reviews-test-03.webp) |
+| Test                                  | Description                                                                                              | Result  | Screenshot                                            |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------- |
+| `test_review_str`                     | Review `__str__` returns correct format `reviewer — document title (rating★)`                            | ✅ Pass | ![](documentation/images/testing/reviews-test-01.png) |
+| `test_unpurchased_user_cannot_review` | A user who has not purchased a document is redirected away from the review form and no review is created | ✅ Pass | ![](documentation/images/testing/reviews-test-02.png) |
+| `test_purchased_user_can_review`      | A user who has purchased a document can successfully submit a review which is saved to the database      | ✅ Pass | ![](documentation/images/testing/reviews-test-03.png) |
 
 ---
 
@@ -787,30 +803,30 @@ All automated tests use Django's built-in testing framework. Tests run against a
 
 All manual tests were carried out on the live Heroku deployment at `https://study-market-fahim-70194c90b021.herokuapp.com/`.
 
-| #   | User Story                                                                 | Test                                                                                                                                         | Expected Result                                                                                                       | Actual Result                                                 | Pass/Fail | Screenshot                                                                 |
-| --- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------- | -------------------------------------------------------------------------- |
-| 1   | As a visitor I can browse all published documents without registering      | Navigate to `/documents/browse/` while logged out                                                                                            | Browse page loads showing all published documents with no login required                                              | Browse page loaded correctly showing all documents            | ✅ Pass   | ![](documentation/images/testing/manual/manual-01-browse-logged-out.webp)  |
-| 2   | As a visitor I can view a document's title, course, price and preview text | Navigate to any document detail page while logged out                                                                                        | Document title, course badge, price, preview text and seller info are all visible                                     | All document details visible without login                    | ✅ Pass   | ![](documentation/images/testing/manual/manual-02-preview-logged-out.webp) |
-| 3   | As a visitor I cannot view full document content without paying            | Navigate to any document detail page while logged out                                                                                        | Locked content card shown with lock icon and Unlock CTA, full content and download not accessible                     | Locked card rendered correctly with no access to full content | ✅ Pass   | ![](documentation/images/testing/manual/manual-03-locked-content.webp)     |
-| 4   | As a visitor I can register an account                                     | Navigate to `/accounts/register/`, fill in form and submit                                                                                   | Account is created and user is redirected to homepage with success message                                            | Account created successfully, redirected to homepage          | ✅ Pass   | ![](documentation/images/testing/manual/manual-04-register-success.webp)   |
-| 5   | As a visitor I can log in                                                  | Navigate to `/accounts/login/`, enter credentials and submit                                                                                 | User is logged in and redirected to homepage with welcome message                                                     | Logged in successfully, redirected to homepage                | ✅ Pass   | ![](documentation/images/testing/manual/manual-05-login-success.webp)      |
-| 6   | As a buyer I can search documents by keyword                               | Enter a keyword in the search bar and submit                                                                                                 | Browse page filters to show only documents matching the keyword                                                       | Documents filtered correctly by keyword                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-06-search.webp)             |
-| 7   | As a buyer I can filter documents by subject                               | Select a subject radio button in the sidebar and click Apply Filters                                                                         | Browse page filters to show only documents in the selected subject                                                    | Documents filtered correctly by subject                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-07-filter-subject.webp)     |
-| 8   | As a buyer I can purchase a document via Stripe                            | Navigate to checkout, enter test card `4242 4242 4242 4242`, expiry `12/34`, CVC `123` and click Pay                                         | Payment is processed, Purchase record created, redirected to success page                                             | Payment processed successfully, redirected to success page    | ✅ Pass   | ![](documentation/images/testing/manual/manual-08-checkout-card.webp)      |
-| 9   | As a buyer I receive clear confirmation after payment                      | Complete a Stripe test payment                                                                                                               | Payment success page rendered with confirmation message                                                               | Success page rendered correctly                               | ✅ Pass   | ![](documentation/images/testing/manual/manual-09-payment-success.webp)    |
-| 10  | As a buyer I can view and download purchased documents from My Purchases   | Navigate to `/payments/my-purchases/` after purchasing a document                                                                            | My Purchases page shows purchased documents with View Now and PDF download buttons                                    | All purchased documents listed with correct buttons           | ✅ Pass   | ![](documentation/images/testing/manual/manual-10-my-purchases.webp)       |
-| 11  | As a buyer I can leave a review on a purchased document                    | Navigate to `/reviews/add/<id>/` for a purchased document, fill in form and submit                                                           | Review is saved and shown on the document detail page                                                                 | Review submitted and displayed correctly                      | ✅ Pass   | ![](documentation/images/testing/manual/manual-11-review-submitted.webp)   |
-| 12  | As a buyer I cannot review a document I have not purchased                 | Navigate to `/reviews/add/<id>/` for an unpurchased document                                                                                 | User is redirected to document detail page with error alert "You must purchase this document before leaving a review" | Redirected correctly with styled error alert                  | ✅ Pass   | ![](documentation/images/testing/manual/manual-12-review-blocked.webp)     |
-| 13  | As a buyer I can edit my review                                            | Navigate to `/reviews/edit/<id>/`, change the review and submit                                                                              | Review is updated and changes are reflected on the document detail page                                               | Review updated successfully                                   | ✅ Pass   | ![](documentation/images/testing/manual/manual-13-edit-review.webp)        |
-| 14  | As a buyer I can delete my review                                          | Navigate to `/reviews/delete/<id>/`, confirm deletion                                                                                        | Review is deleted and no longer appears on the document detail page                                                   | Review deleted successfully                                   | ✅ Pass   | ![](documentation/images/testing/manual/manual-14-delete-review.webp)      |
-| 15  | As a seller I can upload a new document                                    | Navigate to `/documents/seller/upload/`, fill in form, upload a PDF and submit                                                               | Document is created and appears in the seller dashboard                                                               | Document uploaded and visible in dashboard                    | ✅ Pass   | ![](documentation/images/testing/manual/manual-15-upload-success.webp)     |
-| 16  | As a seller I can see all my listings on a dashboard                       | Navigate to `/documents/seller/dashboard/`                                                                                                   | Seller dashboard shows all uploaded documents with title, subject, price, status and action buttons                   | All documents listed correctly                                | ✅ Pass   | ![](documentation/images/testing/manual/manual-16-dashboard.webp)          |
-| 17  | As a seller I can edit my own listings                                     | Click the edit icon on a listing in the dashboard, change a field and submit                                                                 | Document is updated and changes are reflected in the dashboard and detail page                                        | Document updated successfully                                 | ✅ Pass   | ![](documentation/images/testing/manual/manual-17-edit-document.webp)      |
-| 18  | As a seller I can delete my own listings                                   | Click the delete icon on a listing in the dashboard and confirm                                                                              | Document is deleted and no longer appears in the dashboard or browse page                                             | Document deleted successfully                                 | ✅ Pass   | ![](documentation/images/testing/manual/manual-18-delete-document.webp)    |
-| 19  | As a seller I cannot edit or delete another seller's listings              | While logged in as `fahim`, navigate to `/documents/seller/edit/market-structures-past-paper-solutions/` which belongs to a different seller | Custom 404 page returned — document not found for this seller                                                         | 404 page returned correctly, no access granted                | ✅ Pass   | ![](documentation/images/testing/manual/manual-19-edit-blocked-404.webp)   |
-| 20  | As an admin I can manage subjects and courses                              | Navigate to `/admin/courses/subject/` while logged in as superuser                                                                           | Subject list visible with add/edit/delete functionality                                                               | Subjects manageable via admin panel                           | ✅ Pass   | ![](documentation/images/testing/manual/manual-20-admin-subjects.webp)     |
-| 21  | As an admin I can view all purchases                                       | Navigate to `/admin/payments/purchase/` while logged in as superuser                                                                         | All purchase records visible with buyer, document, amount and date                                                    | All purchases listed correctly in admin                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-21-admin-purchases.webp)    |
-| 22  | As an admin I can moderate reviews                                         | Navigate to `/admin/reviews/review/` while logged in as superuser                                                                            | All reviews visible with edit and delete functionality                                                                | Reviews manageable via admin panel                            | ✅ Pass   | ![](documentation/images/testing/manual/manual-22-admin-reviews.webp)      |
+| #   | User Story                                                                 | Test                                                                                                                                         | Expected Result                                                                                                       | Actual Result                                                 | Pass/Fail | Screenshot                                                                |
+| --- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
+| 1   | As a visitor I can browse all published documents without registering      | Navigate to `/documents/browse/` while logged out                                                                                            | Browse page loads showing all published documents with no login required                                              | Browse page loaded correctly showing all documents            | ✅ Pass   | ![](documentation/images/testing/manual/manual-01-browse-logged-out.png)  |
+| 2   | As a visitor I can view a document's title, course, price and preview text | Navigate to any document detail page while logged out                                                                                        | Document title, course badge, price, preview text and seller info are all visible                                     | All document details visible without login                    | ✅ Pass   | ![](documentation/images/testing/manual/manual-02-preview-logged-out.png) |
+| 3   | As a visitor I cannot view full document content without paying            | Navigate to any document detail page while logged out                                                                                        | Locked content card shown with lock icon and Unlock CTA, full content and download not accessible                     | Locked card rendered correctly with no access to full content | ✅ Pass   | ![](documentation/images/testing/manual/manual-03-locked-content.png)     |
+| 4   | As a visitor I can register an account                                     | Navigate to `/accounts/register/`, fill in form and submit                                                                                   | Account is created and user is redirected to homepage with success message                                            | Account created successfully, redirected to homepage          | ✅ Pass   | ![](documentation/images/testing/manual/manual-04-register-success.png)   |
+| 5   | As a visitor I can log in                                                  | Navigate to `/accounts/login/`, enter credentials and submit                                                                                 | User is logged in and redirected to homepage with welcome message                                                     | Logged in successfully, redirected to homepage                | ✅ Pass   | ![](documentation/images/testing/manual/manual-05-login-success.png)      |
+| 6   | As a buyer I can search documents by keyword                               | Enter a keyword in the search bar and submit                                                                                                 | Browse page filters to show only documents matching the keyword                                                       | Documents filtered correctly by keyword                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-06-search.png)             |
+| 7   | As a buyer I can filter documents by subject                               | Select a subject radio button in the sidebar and click Apply Filters                                                                         | Browse page filters to show only documents in the selected subject                                                    | Documents filtered correctly by subject                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-07-filter-subject.png)     |
+| 8   | As a buyer I can purchase a document via Stripe                            | Navigate to checkout, enter test card `4242 4242 4242 4242`, expiry `12/34`, CVC `123` and click Pay                                         | Payment is processed, Purchase record created, redirected to success page                                             | Payment processed successfully, redirected to success page    | ✅ Pass   | ![](documentation/images/testing/manual/manual-08-checkout-card.png)      |
+| 9   | As a buyer I receive clear confirmation after payment                      | Complete a Stripe test payment                                                                                                               | Payment success page rendered with confirmation message                                                               | Success page rendered correctly                               | ✅ Pass   | ![](documentation/images/testing/manual/manual-09-payment-success.png)    |
+| 10  | As a buyer I can view and download purchased documents from My Purchases   | Navigate to `/payments/my-purchases/` after purchasing a document                                                                            | My Purchases page shows purchased documents with View Now and PDF download buttons                                    | All purchased documents listed with correct buttons           | ✅ Pass   | ![](documentation/images/testing/manual/manual-10-my-purchases.png)       |
+| 11  | As a buyer I can leave a review on a purchased document                    | Navigate to `/reviews/add/<id>/` for a purchased document, fill in form and submit                                                           | Review is saved and shown on the document detail page                                                                 | Review submitted and displayed correctly                      | ✅ Pass   | ![](documentation/images/testing/manual/manual-11-review-submitted.png)   |
+| 12  | As a buyer I cannot review a document I have not purchased                 | Navigate to `/reviews/add/<id>/` for an unpurchased document                                                                                 | User is redirected to document detail page with error alert "You must purchase this document before leaving a review" | Redirected correctly with styled error alert                  | ✅ Pass   | ![](documentation/images/testing/manual/manual-12-review-blocked.png)     |
+| 13  | As a buyer I can edit my review                                            | Navigate to `/reviews/edit/<id>/`, change the review and submit                                                                              | Review is updated and changes are reflected on the document detail page                                               | Review updated successfully                                   | ✅ Pass   | ![](documentation/images/testing/manual/manual-13-edit-review.png)        |
+| 14  | As a buyer I can delete my review                                          | Navigate to `/reviews/delete/<id>/`, confirm deletion                                                                                        | Review is deleted and no longer appears on the document detail page                                                   | Review deleted successfully                                   | ✅ Pass   | ![](documentation/images/testing/manual/manual-14-delete-review.png)      |
+| 15  | As a seller I can upload a new document                                    | Navigate to `/documents/seller/upload/`, fill in form, upload a PDF and submit                                                               | Document is created and appears in the seller dashboard                                                               | Document uploaded and visible in dashboard                    | ✅ Pass   | ![](documentation/images/testing/manual/manual-15-upload-success.png)     |
+| 16  | As a seller I can see all my listings on a dashboard                       | Navigate to `/documents/seller/dashboard/`                                                                                                   | Seller dashboard shows all uploaded documents with title, subject, price, status and action buttons                   | All documents listed correctly                                | ✅ Pass   | ![](documentation/images/testing/manual/manual-16-dashboard.png)          |
+| 17  | As a seller I can edit my own listings                                     | Click the edit icon on a listing in the dashboard, change a field and submit                                                                 | Document is updated and changes are reflected in the dashboard and detail page                                        | Document updated successfully                                 | ✅ Pass   | ![](documentation/images/testing/manual/manual-17-edit-document.png)      |
+| 18  | As a seller I can delete my own listings                                   | Click the delete icon on a listing in the dashboard and confirm                                                                              | Document is deleted and no longer appears in the dashboard or browse page                                             | Document deleted successfully                                 | ✅ Pass   | ![](documentation/images/testing/manual/manual-18-delete-document.png)    |
+| 19  | As a seller I cannot edit or delete another seller's listings              | While logged in as `fahim`, navigate to `/documents/seller/edit/market-structures-past-paper-solutions/` which belongs to a different seller | Custom 404 page returned — document not found for this seller                                                         | 404 page returned correctly, no access granted                | ✅ Pass   | ![](documentation/images/testing/manual/manual-19-edit-blocked-404.png)   |
+| 20  | As an admin I can manage subjects and courses                              | Navigate to `/admin/courses/subject/` while logged in as superuser                                                                           | Subject list visible with add/edit/delete functionality                                                               | Subjects manageable via admin panel                           | ✅ Pass   | ![](documentation/images/testing/manual/manual-20-admin-subjects.png)     |
+| 21  | As an admin I can view all purchases                                       | Navigate to `/admin/payments/purchase/` while logged in as superuser                                                                         | All purchase records visible with buyer, document, amount and date                                                    | All purchases listed correctly in admin                       | ✅ Pass   | ![](documentation/images/testing/manual/manual-21-admin-purchases.png)    |
+| 22  | As an admin I can moderate reviews                                         | Navigate to `/admin/reviews/review/` while logged in as superuser                                                                            | All reviews visible with edit and delete functionality                                                                | Reviews manageable via admin panel                            | ✅ Pass   | ![](documentation/images/testing/manual/manual-22-admin-reviews.png)      |
 
 _(User story → test → expected → actual → pass/fail table — to be completed.)_
 
@@ -824,19 +840,19 @@ All pages were validated using the [W3C Nu HTML Checker](https://validator.w3.or
 
 One issue was identified and fixed during validation: the Add Review page had a heading hierarchy starting at `<h2>` with no preceding `<h1>`. This was corrected by changing the heading to `<h1>` with Bootstrap's `h2` class applied to maintain visual size. The footer column headings were also changed from `<h3>` to `<h2>` to avoid skipping heading levels after the page `<h1>`.
 
-| Page             | Method      | Result    | Screenshot                                                                   |
-| ---------------- | ----------- | --------- | ---------------------------------------------------------------------------- |
-| Homepage         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-homepage.webp)         |
-| Browse           | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-browse.webp)           |
-| Document Detail  | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-document-detail.webp)  |
-| Login            | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-login.webp)            |
-| Register         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-register.webp)         |
-| 404 Page         | Page source | No errors | ![](documentation/images/testing/validation/html/html-404.webp)              |
-| My Purchases     | Page source | No errors | ![](documentation/images/testing/validation/html/html-my-purchases.webp)     |
-| Seller Dashboard | Page source | No errors | ![](documentation/images/testing/validation/html/html-seller-dashboard.webp) |
-| Upload Document  | Page source | No errors | ![](documentation/images/testing/validation/html/html-upload.webp)           |
-| Checkout         | Page source | No errors | ![](documentation/images/testing/validation/html/html-checkout.webp)         |
-| Add Review       | Page source | No errors | ![](documentation/images/testing/validation/html/html-add-review.webp)       |
+| Page             | Method      | Result    | Screenshot                                                                  |
+| ---------------- | ----------- | --------- | --------------------------------------------------------------------------- |
+| Homepage         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-homepage.png)         |
+| Browse           | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-browse.png)           |
+| Document Detail  | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-document-detail.png)  |
+| Login            | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-login.png)            |
+| Register         | Direct URL  | No errors | ![](documentation/images/testing/validation/html/html-register.png)         |
+| 404 Page         | Page source | No errors | ![](documentation/images/testing/validation/html/html-404.png)              |
+| My Purchases     | Page source | No errors | ![](documentation/images/testing/validation/html/html-my-purchases.png)     |
+| Seller Dashboard | Page source | No errors | ![](documentation/images/testing/validation/html/html-seller-dashboard.png) |
+| Upload Document  | Page source | No errors | ![](documentation/images/testing/validation/html/html-upload.png)           |
+| Checkout         | Page source | No errors | ![](documentation/images/testing/validation/html/html-checkout.png)         |
+| Add Review       | Page source | No errors | ![](documentation/images/testing/validation/html/html-add-review.png)       |
 
 #### CSS Validation
 
@@ -847,47 +863,47 @@ The CSS file `static/css/style.css` was validated using the [W3C CSS Validator (
 - **CSS variables not statically checked** — the validator cannot evaluate `var()` custom properties at validation time. This is a known limitation of the validator and not an indication of any issue with the code.
 - **Same colour for `background-color` and `border-color`** — intentional in the button design system where border and background match to create solid filled buttons.
 
-![CSS Validation](documentation/images/testing/validation/css/css-validation.webp)
+![CSS Validation](documentation/images/testing/validation/css/css-validation.png)
 
 #### Python PEP8 Validation
 
 All Python files were validated using the [CI Python Linter](https://pep8ci.herokuapp.com/). `autopep8` was run across the project with `--max-line-length 79 --recursive` to automatically fix line length issues. Remaining long lines in `AUTH_PASSWORD_VALIDATORS` in `settings.py` were fixed by splitting the validator class paths across multiple lines using Python string concatenation.
 
-| File                      | Result    | Screenshot                                                                     |
-| ------------------------- | --------- | ------------------------------------------------------------------------------ |
-| `studymarket/settings.py` | No errors | ![](documentation/images/testing/validation/python/pep8-settings.webp)         |
-| `studymarket/urls.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-studymarket-urls.webp) |
-| `accounts/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-admin.webp)   |
-| `accounts/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-apps.webp)    |
-| `accounts/forms.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-forms.webp)   |
-| `accounts/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-models.webp)  |
-| `accounts/signals.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-signals.webp) |
-| `accounts/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-urls.webp)    |
-| `accounts/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-views.webp)   |
-| `courses/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-courses-admin.webp)    |
-| `courses/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-apps.webp)     |
-| `courses/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-courses-models.webp)   |
-| `courses/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-urls.webp)     |
-| `documents/admin.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-admin.webp)   |
-| `documents/apps.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-apps.webp)   |
-| `documents/forms.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-documents-forms.webp)  |
-| `documents/models.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-documents-models.webp) |
-| `documents/urls.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-urls.webp)   |
-| `documents/views.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-views.webp)   |
-| `home/apps.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-apps.webp)        |
-| `home/urls.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-urls.webp)        |
-| `home/views.py`           | No errors | ![](documentation/images/testing/validation/python/pep8-home-views.webp)       |
-| `payments/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-admin.webp)   |
-| `payments/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-apps.webp)    |
-| `payments/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-payments-models.webp)  |
-| `payments/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-urls.webp)    |
-| `payments/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-views.webp)   |
-| `reviews/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-admin.webp)    |
-| `reviews/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-apps.webp)     |
-| `reviews/forms.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-forms.webp)    |
-| `reviews/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-models.webp)   |
-| `reviews/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-urls.webp)     |
-| `reviews/views.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-views.webp)    |
+| File                      | Result    | Screenshot                                                                    |
+| ------------------------- | --------- | ----------------------------------------------------------------------------- |
+| `studymarket/settings.py` | No errors | ![](documentation/images/testing/validation/python/pep8-settings.png)         |
+| `studymarket/urls.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-studymarket-urls.png) |
+| `accounts/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-admin.png)   |
+| `accounts/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-apps.png)    |
+| `accounts/forms.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-forms.png)   |
+| `accounts/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-models.png)  |
+| `accounts/signals.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-signals.png) |
+| `accounts/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-urls.png)    |
+| `accounts/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-views.png)   |
+| `courses/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-courses-admin.png)    |
+| `courses/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-apps.png)     |
+| `courses/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-courses-models.png)   |
+| `courses/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-urls.png)     |
+| `documents/admin.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-admin.png)   |
+| `documents/apps.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-apps.png)   |
+| `documents/forms.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-documents-forms.png)  |
+| `documents/models.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-documents-models.png) |
+| `documents/urls.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-urls.png)   |
+| `documents/views.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-views.png)   |
+| `home/apps.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-apps.png)        |
+| `home/urls.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-urls.png)        |
+| `home/views.py`           | No errors | ![](documentation/images/testing/validation/python/pep8-home-views.png)       |
+| `payments/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-admin.png)   |
+| `payments/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-apps.png)    |
+| `payments/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-payments-models.png)  |
+| `payments/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-urls.png)    |
+| `payments/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-views.png)   |
+| `reviews/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-admin.png)    |
+| `reviews/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-apps.png)     |
+| `reviews/forms.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-forms.png)    |
+| `reviews/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-models.png)   |
+| `reviews/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-urls.png)     |
+| `reviews/views.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-views.png)    |
 
 #### JavaScript Validation
 
@@ -901,13 +917,13 @@ Both JavaScript files were validated using [JSHint](https://jshint.com/).
 
 No errors were found.
 
-![JS Checkout Validation](documentation/images/testing/validation/js/js-checkout.webp)
+![JS Checkout Validation](documentation/images/testing/validation/js/js-checkout.png)
 
 **`alerts.js`**
 
 No errors or warnings found.
 
-![JS Alerts Validation](documentation/images/testing/validation/js/js-alerts.webp)
+![JS Alerts Validation](documentation/images/testing/validation/js/js-alerts.png)
 
 #### Lighthouse
 
@@ -959,9 +975,120 @@ Lighthouse scores were measured using Google PageSpeed Insights on the live Hero
 
 ---
 
-### Responsiveness
+### Responsiveness Testing
 
-_(Chrome / Safari / Firefox × Desktop / Tablet / Mobile — to be completed.)_
+Responsiveness was tested across Chrome and Mozilla Firefox using browser developer tools to simulate tablet and mobile viewports, and on a physical desktop. All pages were tested at three breakpoints: Desktop (1440px), Tablet (768px — iPad Air), and Mobile (390px — iPhone 12 Pro).
+
+| Page             | Browser | Desktop | Tablet  | Mobile  |
+| ---------------- | ------- | ------- | ------- | ------- |
+| Homepage         | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Homepage         | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Browse           | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Browse           | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Document Detail  | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Document Detail  | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Login            | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Login            | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Register         | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Register         | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Checkout         | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Checkout         | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| My Purchases     | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| My Purchases     | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Seller Dashboard | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Seller Dashboard | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| Upload           | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| Upload           | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+| 404              | Chrome  | ✅ Pass | ✅ Pass | ✅ Pass |
+| 404              | Firefox | ✅ Pass | ✅ Pass | ✅ Pass |
+
+#### Screenshots
+
+**Homepage**
+
+| Chrome Desktop                                                           | Chrome Tablet                                                           | Chrome Mobile                                                           |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-home-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-home-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-home-mobile.png) |
+
+| Firefox Desktop                                                           | Firefox Tablet                                                           | Firefox Mobile                                                           |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| ![](documentation/images/testing/responsiveness/mozilla-home-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-home-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-home-mobile.png) |
+
+**Browse**
+
+| Chrome Desktop                                                             | Chrome Tablet                                                             | Chrome Mobile                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-browse-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-browse-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-browse-mobile.png) |
+
+| Firefox Desktop                                                             | Firefox Tablet                                                             | Firefox Mobile                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-browse-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-browse-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-browse-mobile.png) |
+
+**Document Detail**
+
+| Chrome Desktop                                                             | Chrome Tablet                                                             | Chrome Mobile                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-detail-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-detail-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-detail-mobile.png) |
+
+| Firefox Desktop                                                             | Firefox Tablet                                                             | Firefox Mobile                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-detail-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-detail-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-detail-mobile.png) |
+
+**Login**
+
+| Chrome Desktop                                                            | Chrome Tablet                                                            | Chrome Mobile                                                            |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| ![](documentation/images/testing/responsiveness/chrome-login-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-login-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-login-mobile.png) |
+
+| Firefox Desktop                                                            | Firefox Tablet                                                            | Firefox Mobile                                                            |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-login-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-login-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-login-mobile.png) |
+
+**Checkout**
+
+| Chrome Desktop                                                          | Chrome Tablet                                                          | Chrome Mobile                                                          |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-pay-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-pay-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-pay-mobile.png) |
+
+| Firefox Desktop                                                          | Firefox Tablet                                                          | Firefox Mobile                                                          |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-pay-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-pay-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-pay-mobile.png) |
+
+**My Purchases**
+
+| Chrome Desktop                                                                | Chrome Tablet                                                                | Chrome Mobile                                                                |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-purchases-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-purchases-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-purchases-mobile.png) |
+
+| Firefox Desktop                                                                | Firefox Tablet                                                                | Firefox Mobile                                                                |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-purchases-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-purchases-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-purchases-mobile.png) |
+
+**Seller Dashboard**
+
+| Chrome Desktop                                                             | Chrome Tablet                                                             | Chrome Mobile                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-seller-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-seller-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-seller-mobile.png) |
+
+| Firefox Desktop                                                             | Firefox Tablet                                                             | Firefox Mobile                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-seller-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-seller-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-seller-mobile.png) |
+
+**Upload**
+
+| Chrome Desktop                                                             | Chrome Tablet                                                             | Chrome Mobile                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-upload-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-upload-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-upload-mobile.png) |
+
+| Firefox Desktop                                                             | Firefox Tablet                                                             | Firefox Mobile                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/mozilla-upload-desktop.png) | ![](documentation/images/testing/responsiveness/mozilla-upload-tablet.png) | ![](documentation/images/testing/responsiveness/mozilla-upload-mobile.png) |
+
+**404 Page**
+
+| Chrome Desktop                                                          | Chrome Tablet                                                          | Chrome Mobile                                                          |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| ![](documentation/images/testing/responsiveness/chrome-404-desktop.png) | ![](documentation/images/testing/responsiveness/chrome-404-tablet.png) | ![](documentation/images/testing/responsiveness/chrome-404-mobile.png) |
 
 ---
 
@@ -994,8 +1121,8 @@ git push heroku main
 - **Root cause:** `runtime.txt` is Heroku's older, now-deprecated method for pinning a Python version. Heroku's current buildpack expects a `.python-version` file instead, containing only the major version number (no `python-` prefix, no patch version).
 - **Fix:** Removed `runtime.txt` and replaced it with `.python-version` containing just the major version.
 
-**Before** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.webp)
-**After** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.webp)
+**Before** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack.png)
+**After** ![screenshot](documentation/images/bugs/bug-01-heroku-buildpack-after.png)
 
 ---
 
@@ -1024,7 +1151,7 @@ STORAGES = {
 }
 ```
 
-- **Screenshot:** ![Bug 3](documentation/images/bugs/bug-03-static-root.webp)
+- **Screenshot:** ![Bug 3](documentation/images/bugs/bug-03-static-root.png)
 
 ---
 
@@ -1052,7 +1179,7 @@ if 'test' in sys.argv:
 - **Root cause:** `accounts/urls.py` referenced `views.login_view`, but a custom `login_view` function had not yet been written in `accounts/views.py` at the time of that commit.
 - **Fix:** Added the missing `login_view` function to `accounts/views.py`.
 
-- **Screenshot:** ![Bug 5](documentation/images/bugs/bug-05-login-view-error.webp)
+- **Screenshot:** ![Bug 5](documentation/images/bugs/bug-05-login-view-error.png)
 
 ---
 
@@ -1062,8 +1189,8 @@ if 'test' in sys.argv:
 - **Root cause:** `STATICFILES_DIRS` was missing from `settings.py`. Without it, Django had no way to locate `style.css` at all during development.
 - **Fix:** Added `STATICFILES_DIRS = [BASE_DIR / "static"]` to `settings.py`.
 
-**Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.webp)
-**After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.webp)
+**Before:** ![Bug 6 before](documentation/images/bugs/bug-06-static-before.png)
+**After:** ![Bug 6 after](documentation/images/bugs/bug-06-static-after.png)
 
 ---
 
@@ -1073,8 +1200,8 @@ if 'test' in sys.argv:
 - **Root cause:** The `STORAGES` setting only defined the `staticfiles` backend. Django's `FileField` also requires a `default` backend for media file uploads.
 - **Fix:** Added the `default` key to `STORAGES`.
 
-**Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.webp)
-**After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.webp)
+**Before:** ![Bug 7 before](documentation/images/bugs/bug-07-storage-before.png)
+**After:** ![Bug 7 after](documentation/images/bugs/bug-07-storage-after.png)
 
 ---
 
@@ -1082,13 +1209,13 @@ if 'test' in sys.argv:
 
 **Issue:** `TemplateSyntaxError` at `/payments/checkout/242/` — `{% extends "base.html" %} must be the first tag in 'payments/checkout.html'`.
 
-![Bug 8 before fix](documentation/images/bugs/bug-08-extends-before.webp)
+![Bug 8 before fix](documentation/images/bugs/bug-08-extends-before.png)
 
 **Cause:** When separating the Stripe JavaScript into a static file, `{% load static %}` was added to line 1, pushing `{% extends "base.html" %}` to line 2. Django requires `{% extends %}` to be the absolute first tag in any template that inherits from a base.
 
 **Fix:** Swapped the order so `{% extends "base.html" %}` appears on line 1 and `{% load static %}` on line 2.
 
-![Bug 8 after fix](documentation/images/bugs/bug-08-extends-after.webp)
+![Bug 8 after fix](documentation/images/bugs/bug-08-extends-after.png)
 
 ---
 
@@ -1096,13 +1223,13 @@ if 'test' in sys.argv:
 
 **Issue:** On pages with little content, the footer floated halfway up the screen leaving a large blank gap below it.
 
-![Bug 9 before fix](documentation/images/bugs/bug-09-footer-before.webp)
+![Bug 9 before fix](documentation/images/bugs/bug-09-footer-before.png)
 
 **Cause:** The `body` element had no minimum height set, so on short pages the footer rendered immediately after the content.
 
 **Fix:** Added `min-height: 100vh` and `display: flex; flex-direction: column` to `body` in `style.css`, and `flex: 1` to `main`.
 
-![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.webp)
+![Bug 9 after fix](documentation/images/bugs/bug-09-footer-after.png)
 
 ---
 
@@ -1112,7 +1239,7 @@ Three related issues prevented the payment flow from working end to end.
 
 **Issue 1 — UnboundLocalError on GET request**
 
-![Bug 10 before - UnboundLocalError](documentation/images/bugs/bug-10-unbound-intent-before.webp)
+![Bug 10 before - UnboundLocalError](documentation/images/bugs/bug-10-unbound-intent-before.png)
 
 **Cause:** The `return JsonResponse` statement was outside the `if request.method == "POST"` block. On a GET request, `intent` is never created so Python raised an error accessing `intent.client_secret`.
 
@@ -1132,7 +1259,7 @@ return render(request, "payments/checkout.html", {
 
 **Issue 2 — Postal code field blocking payment**
 
-![Bug 10 before - postal code](documentation/images/bugs/bug-10-postal-code-before.webp)
+![Bug 10 before - postal code](documentation/images/bugs/bug-10-postal-code-before.png)
 
 **Cause:** Stripe's card element defaults to US postal code format (5 numeric digits). UK postcodes contain letters so the field could never be completed.
 
@@ -1144,7 +1271,7 @@ const card = elements.create("card", { hidePostalCode: true });
 
 **Issue 3 — client_secret not being passed to Stripe**
 
-![Bug 10 before - console error](documentation/images/bugs/bug-10-client-secret-console-before.webp)
+![Bug 10 before - console error](documentation/images/bugs/bug-10-client-secret-console-before.png)
 
 **Cause:** The JS was reading `clientSecret` from an HTML data attribute set at page load, which is empty on GET because no PaymentIntent exists until form submission.
 
@@ -1157,7 +1284,7 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 });
 ```
 
-![Bug 10 after - payment success](documentation/images/bugs/bug-10-payment-success-after.webp)
+![Bug 10 after - payment success](documentation/images/bugs/bug-10-payment-success-after.png)
 
 ---
 
@@ -1173,13 +1300,13 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 
 **Issue:** The footer was visible locally but completely absent on Heroku.
 
-![Bug 12 before fix](documentation/images/bugs/bug-12-footer-missing-before.webp)
+![Bug 12 before fix](documentation/images/bugs/bug-12-footer-missing-before.png)
 
 **Cause:** The `{% include 'includes/footer.html' %}` line had been added to `base.html` locally but never committed to git. Confirmed with `git show HEAD:templates/base.html | grep footer` which returned nothing.
 
 **Fix:** Staged and committed `templates/base.html` with the footer include in place.
 
-![Bug 12 after fix](documentation/images/bugs/bug-12-footer-missing-after.webp)
+![Bug 12 after fix](documentation/images/bugs/bug-12-footer-missing-after.png)
 
 ---
 
@@ -1187,13 +1314,13 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 
 **Issue:** After deleting a review, the reviews section disappeared entirely — including the "Write a Review" button.
 
-![Bug 13 before fix](documentation/images/bugs/bug-13-reviews-section-missing-before.webp)
+![Bug 13 before fix](documentation/images/bugs/bug-13-reviews-section-missing-before.png)
 
 **Cause:** When the detail template was rewritten to wire up checkout buttons, the reviews section lost its wrapping card container and the `{% if has_purchased and not user_has_reviewed %}` block.
 
 **Fix:** Rewrote the reviews section with the correct card wrapper, fallback "No reviews yet" message and conditional "Write a Review" button.
 
-![Bug 13 after fix](documentation/images/bugs/bug-13-reviews-section-missing-after.webp)
+![Bug 13 after fix](documentation/images/bugs/bug-13-reviews-section-missing-after.png)
 
 ---
 
@@ -1201,7 +1328,7 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 
 **Issue:** All document detail pages threw 500 Internal Server Error on Heroku while working locally.
 
-![Bug 14 before fix](documentation/images/bugs/bug-14-heroku-500-before.webp)
+![Bug 14 before fix](documentation/images/bugs/bug-14-heroku-500-before.png)
 
 **Cause:** Several local changes had never been staged and committed — most critically, `reviews` was added to `INSTALLED_APPS` locally but the updated `settings.py` was never committed, so Heroku threw `RuntimeError: Model class reviews.models.Review doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS`.
 
@@ -1209,7 +1336,7 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 
 **Prevention:** Always run `git status` before pushing. Each feature should be committed in its entirety before moving on.
 
-![Bug 14 after fix](documentation/images/bugs/bug-14-heroku-500-after.webp)
+![Bug 14 after fix](documentation/images/bugs/bug-14-heroku-500-after.png)
 
 ---
 
@@ -1217,7 +1344,7 @@ const result = await stripe.confirmCardPayment(data.client_secret, {
 
 **Issue:** On the live site, clicking Unlock did nothing. The browser console showed `Uncaught IntegrationError: Please call Stripe() with your publishable key. You used an empty string.`
 
-![Bug 15 before fix](documentation/images/bugs/bug-15-stripe-public-key-before.webp)
+![Bug 15 before fix](documentation/images/bugs/bug-15-stripe-public-key-before.png)
 
 **Cause:** `STRIPE_PUBLIC_KEY` had not been set in Heroku's config vars. `env.py` is in `.gitignore` and never deployed — every variable in `env.py` must also be set manually in Heroku config vars. During the fix, the secret key (`sk_test_...`) was accidentally entered as the public key — this was caught immediately and corrected.
 
@@ -1228,7 +1355,7 @@ heroku config:set STRIPE_PUBLIC_KEY=pk_test_...
 heroku config:get STRIPE_PUBLIC_KEY
 ```
 
-![Bug 15 after fix](documentation/images/bugs/bug-15-stripe-public-key-after.webp)
+![Bug 15 after fix](documentation/images/bugs/bug-15-stripe-public-key-after.png)
 
 ---
 
@@ -1236,7 +1363,7 @@ heroku config:get STRIPE_PUBLIC_KEY
 
 **Issue:** Every Heroku deploy failed during `collectstatic` with `AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'`.
 
-![Bug 16 before fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-before.webp)
+![Bug 16 before fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-before.png)
 
 **Cause:** `django-cloudinary-storage==0.3.0` still references `settings.STATICFILES_STORAGE` which was removed in Django 5.2. The package itself needed updating but the maintainers had not released a compatible version.
 
@@ -1248,7 +1375,7 @@ heroku config:set DISABLE_COLLECTSTATIC=1
 
 Static files are instead collected locally and committed to the repository.
 
-![Bug 16 after fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-after.webp)
+![Bug 16 after fix](documentation/images/bugs/bug-16-cloudinary-collectstatic-after.png)
 
 ---
 
@@ -1256,7 +1383,7 @@ Static files are instead collected locally and committed to the repository.
 
 **Issue:** After uploading a document, the redirect to the seller dashboard threw `NoReverseMatch: Reverse for 'edit' not found`.
 
-![Bug 17 before fix](documentation/images/bugs/bug-17-no-reverse-match-before.webp)
+![Bug 17 before fix](documentation/images/bugs/bug-17-no-reverse-match-before.png)
 
 **Cause:** The `seller_dashboard.html` template was written with Edit and Delete buttons before the corresponding views and URL patterns had been built. Django resolves all `{% url %}` tags at render time and raises `NoReverseMatch` immediately if any named URL cannot be found.
 
@@ -1268,7 +1395,7 @@ Static files are instead collected locally and committed to the repository.
 
 **Issue:** Navigating to `http://127.0.0.1:8000/seller/upload/` returned a 404 error.
 
-![Bug 18 before fix](documentation/images/bugs/bug-18-upload-404-before.webp)
+![Bug 18 before fix](documentation/images/bugs/bug-18-upload-404-before.png)
 
 **Cause:** The upload view is registered inside `documents/urls.py` which is included under the `documents/` prefix. The correct path is `http://127.0.0.1:8000/documents/seller/upload/`.
 
@@ -1280,7 +1407,7 @@ Static files are instead collected locally and committed to the repository.
 
 **Issue:** Uploading a 57MB PDF threw an unhandled `BadRequest: File size too large. Got 59705814. Maximum is 10485760.`
 
-![Bug 19 before fix](documentation/images/bugs/bug-19-cloudinary-file-size-before.webp)
+![Bug 19 before fix](documentation/images/bugs/bug-19-cloudinary-file-size-before.png)
 
 **Cause:** `DocumentForm` had no file size validation — it accepted any file and only hit the Cloudinary limit after the full upload was sent to the API.
 
@@ -1302,13 +1429,13 @@ def clean_file(self):
 
 **Issue:** After logging in, users were redirected to `/documents/browse/` instead of the homepage.
 
-![Bug 20 before fix](documentation/images/bugs/bug-20-login-redirect-before.webp)
+![Bug 20 before fix](documentation/images/bugs/bug-20-login-redirect-before.png)
 
 **Cause:** The custom `login_view` had hardcoded `redirect("documents:browse")` which overrode the `LOGIN_REDIRECT_URL = 'home:home'` setting entirely. Django's `LOGIN_REDIRECT_URL` only applies to the built-in auth views, not custom views.
 
 **Fix:** Updated both redirect calls in `accounts/views.py` to `redirect("home:home")`.
 
-![Bug 20 after fix](documentation/images/bugs/bug-20-login-redirect-after.webp)
+![Bug 20 after fix](documentation/images/bugs/bug-20-login-redirect-after.png)
 
 ---
 
@@ -1316,7 +1443,7 @@ def clean_file(self):
 
 **Issue:** After deploying, every page on Heroku threw 500 with `ValueError: Missing staticfiles manifest entry for 'css/style.css'`.
 
-![Bug 21 before fix](documentation/images/bugs/bug-21-staticfiles-manifest-before.webp)
+![Bug 21 before fix](documentation/images/bugs/bug-21-staticfiles-manifest-before.png)
 
 **Cause:** Whitenoise's `CompressedManifestStaticFilesStorage` requires a `staticfiles.json` manifest generated by `collectstatic`. Since `DISABLE_COLLECTSTATIC=1` was set (Bug 16), Heroku never ran collectstatic. Additionally `staticfiles/` was in `.gitignore` so the locally-generated manifest was never committed. The Cloudinary incompatibility also prevented running collectstatic locally with Cloudinary installed.
 
@@ -1333,7 +1460,7 @@ git push origin main
 git push heroku main
 ```
 
-![Bug 21 after fix](documentation/images/bugs/bug-21-staticfiles-manifest-after.webp)
+![Bug 21 after fix](documentation/images/bugs/bug-21-staticfiles-manifest-after.png)
 
 ### Bug 22: Stripe secret key not set on Heroku causing checkout 500 error
 
@@ -1361,7 +1488,7 @@ heroku config:set STRIPE_SECRET_KEY=sk_test_...
 
 After the dyno restarted with the correct key, the checkout view successfully created a PaymentIntent, returned the `client_secret` as JSON, and the full payment flow completed correctly on the live Heroku site.
 
-## ![Bug 22 after fix](documentation/images/bugs/bug-22-stripe-secret-key-after.webp)
+## ![Bug 22 after fix](documentation/images/bugs/bug-22-stripe-secret-key-after.png)
 
 ### Bug 23: Edit document throwing 500 error when no new file uploaded
 
@@ -1373,7 +1500,7 @@ if file and file.size > 10 * 1024 * 1024:
 TypeError: '>' not supported between instances of 'NoneType' and 'int'
 ```
 
-![Bug 23 before fix](documentation/images/bugs/bug-23-edit-document-before.webp)
+![Bug 23 before fix](documentation/images/bugs/bug-23-edit-document-before.png)
 
 **Cause:** When editing a document without uploading a new file, Cloudinary returns a file object where `.size` is `None` rather than an integer. The `clean_file` validation method checked `if file and file.size > 10 * 1024 * 1024` — `file` was truthy (the Cloudinary object existed) but `file.size` was `None`, causing Python to throw a `TypeError` when comparing `None > int`. This only surfaced on Heroku because Cloudinary is only used in production — locally Django uses the filesystem storage backend where `.size` is always a valid integer.
 
@@ -1401,7 +1528,7 @@ if not request.FILES.get('file'):
 
 After deploying, editing a document without re-uploading the file worked correctly and redirected to the seller dashboard with a success message.
 
-![Bug 23 after fix](documentation/images/bugs/bug-23-edit-document-after.webp)
+![Bug 23 after fix](documentation/images/bugs/bug-23-edit-document-after.png)
 
 ## Design Decisions
 
