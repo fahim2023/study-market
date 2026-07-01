@@ -26,7 +26,7 @@
     </div>
     <div class="col-lg-6 mt-5 mt-lg-0">
         <div class="hero-image-wrapper">
-            <img src="{% static 'images/hero_image.png' %}"
+            <img src="{% static 'images/hero_image.webp' %}"
                  alt="StudyMarket — laptop with study notes on screen"
                  class="hero-image">
             <div class="hero-badge">
@@ -91,19 +91,19 @@
             <div class="card h-100 document-card">
                 <div class="document-thumbnail position-relative overflow-hidden">
                     {% if document.course.subject.name == 'Biology' %}
-                    <img src="{% static 'images/biology.png' %}" alt="Biology" class="subject-thumbnail-img">
+                    <img src="{% static 'images/biology.webp' %}" alt="Biology" class="subject-thumbnail-img">
                     {% elif document.course.subject.name == 'Economics' %}
-                    <img src="{% static 'images/economics.png' %}" alt="Economics" class="subject-thumbnail-img">
+                    <img src="{% static 'images/economics.webp' %}" alt="Economics" class="subject-thumbnail-img">
                     {% elif document.course.subject.name == 'History' %}
-                    <img src="{% static 'images/history.png' %}" alt="History" class="subject-thumbnail-img">
+                    <img src="{% static 'images/history.webp' %}" alt="History" class="subject-thumbnail-img">
                     {% elif document.course.subject.name == 'Law' %}
-                    <img src="{% static 'images/law.png' %}" alt="Law" class="subject-thumbnail-img">
+                    <img src="{% static 'images/law.webp' %}" alt="Law" class="subject-thumbnail-img">
                     {% elif document.course.subject.name == 'Mathematics' %}
-                    <img src="{% static 'images/math.png' %}" alt="Mathematics" class="subject-thumbnail-img">
+                    <img src="{% static 'images/math.webp' %}" alt="Mathematics" class="subject-thumbnail-img">
                     {% elif document.course.subject.name == 'Psychology' %}
-                    <img src="{% static 'images/psychology.png' %}" alt="Psychology" class="subject-thumbnail-img">
+                    <img src="{% static 'images/psychology.webp' %}" alt="Psychology" class="subject-thumbnail-img">
                     {% else %}
-                    <img src="{% static 'images/general.png' %}" alt="Study notes" class="subject-thumbnail-img">
+                    <img src="{% static 'images/general.webp' %}" alt="Study notes" class="subject-thumbnail-img">
                     {% endif %}
                     {% if document.id not in purchased_ids %}
                     <div class="locked-overlay"></div>
