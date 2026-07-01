@@ -911,7 +911,51 @@ No errors or warnings found.
 
 #### Lighthouse
 
-_(Lighthouse scores for key pages — to be completed.)_
+Lighthouse scores were measured using Google PageSpeed Insights on the live Heroku deployment. Scores improved significantly after converting all images from PNG to WebP format.
+
+**Homepage — Desktop**
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 97    |
+| Accessibility  | 85    |
+| Best Practices | 100   |
+| SEO            | 91    |
+
+![Lighthouse Homepage Desktop](documentation/images/testing/lighthouse-desktop.png)
+
+**Homepage — Mobile**
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 77    |
+| Accessibility  | 83    |
+| Best Practices | 100   |
+| SEO            | 91    |
+
+![Lighthouse Homepage Mobile](documentation/images/testing/lighthouse-mobile.png)
+
+**Browse Page — Desktop**
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 97    |
+| Accessibility  | 89    |
+| Best Practices | 100   |
+| SEO            | 91    |
+
+![Lighthouse Browse Desktop](documentation/images/testing/lighthouse-browse-desktop.png)
+
+**Browse Page — Mobile**
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 86    |
+| Accessibility  | 89    |
+| Best Practices | 100   |
+| SEO            | 91    |
+
+![Lighthouse Browse Mobile](documentation/images/testing/lighthouse-browse-mobile.png)
 
 ---
 
