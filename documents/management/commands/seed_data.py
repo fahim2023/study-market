@@ -195,7 +195,8 @@ class Command(BaseCommand):
             user.profile.bio = f"Top achieving student at {user.profile.institution} offering premium structural study layouts."
             user.profile.save()
             sellers.append(user)
-        self.stdout.write(self.style.SUCCESS(f"  {len(sellers)} sellers created"))
+        self.stdout.write(self.style.SUCCESS(
+            f"  {len(sellers)} sellers created"))
 
         # --- Step 4: Create buyer accounts ---
         self.stdout.write("Creating buyer accounts...")
@@ -288,7 +289,8 @@ class Command(BaseCommand):
             story = []
 
             # Write the authentic text inside the actual PDF
-            story.append(Paragraph(f"Premium Study Content: {title}", styles["Title"]))
+            story.append(
+                Paragraph(f"Premium Study Content: {title}", styles["Title"]))
             story.append(Spacer(1, 12))
             story.append(Paragraph(academic_notes, styles["Normal"]))
             story.append(Spacer(1, 12))
@@ -327,7 +329,8 @@ class Command(BaseCommand):
             )
 
             # 5. Assemble the final preview text
-            preview_text = chosen_intro + " " + " ".join(selected_body_sentences)
+            preview_text = chosen_intro + " " + \
+                " ".join(selected_body_sentences)
 
             # 6. Build a real description from topic sentences
             description_sentences = [

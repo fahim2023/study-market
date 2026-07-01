@@ -851,7 +851,43 @@ The CSS file `static/css/style.css` was validated using the [W3C CSS Validator (
 
 #### Python PEP8 Validation
 
-_(CI Python Linter results — to be completed.)_
+All Python files were validated using the [CI Python Linter](https://pep8ci.herokuapp.com/). `autopep8` was run across the project with `--max-line-length 79 --recursive` to automatically fix line length issues. Remaining long lines in `AUTH_PASSWORD_VALIDATORS` in `settings.py` were fixed by splitting the validator class paths across multiple lines using Python string concatenation.
+
+| File                      | Result    | Screenshot                                                                    |
+| ------------------------- | --------- | ----------------------------------------------------------------------------- |
+| `studymarket/settings.py` | No errors | ![](documentation/images/testing/validation/python/pep8-settings.png)         |
+| `studymarket/urls.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-studymarket-urls.png) |
+| `accounts/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-admin.png)   |
+| `accounts/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-apps.png)    |
+| `accounts/forms.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-forms.png)   |
+| `accounts/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-models.png)  |
+| `accounts/signals.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-signals.png) |
+| `accounts/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-urls.png)    |
+| `accounts/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-accounts-views.png)   |
+| `courses/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-courses-admin.png)    |
+| `courses/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-apps.png)     |
+| `courses/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-courses-models.png)   |
+| `courses/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-courses-urls.png)     |
+| `documents/admin.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-admin.png)   |
+| `documents/apps.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-apps.png)   |
+| `documents/forms.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-documents-forms.png)  |
+| `documents/models.py`     | No errors | ![](documentation/images/testing/validation/python/pep8-documents-models.png) |
+| `documents/urls.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-documents-urls.png)   |
+| `documents/views.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-document-views.png)   |
+| `home/apps.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-apps.png)        |
+| `home/urls.py`            | No errors | ![](documentation/images/testing/validation/python/pep8-home-urls.png)        |
+| `home/views.py`           | No errors | ![](documentation/images/testing/validation/python/pep8-home-views.png)       |
+| `payments/admin.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-admin.png)   |
+| `payments/apps.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-apps.png)    |
+| `payments/models.py`      | No errors | ![](documentation/images/testing/validation/python/pep8-payments-models.png)  |
+| `payments/urls.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-payments-urls.png)    |
+| `payments/views.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-payments-views.png)   |
+| `reviews/admin.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-admin.png)    |
+| `reviews/apps.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-apps.png)     |
+| `reviews/forms.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-forms.png)    |
+| `reviews/models.py`       | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-models.png)   |
+| `reviews/urls.py`         | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-urls.png)     |
+| `reviews/views.py`        | No errors | ![](documentation/images/testing/validation/python/pep8-reviews-views.png)    |
 
 #### JavaScript Validation
 

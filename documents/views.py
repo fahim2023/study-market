@@ -1,24 +1,29 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
 from django.core.paginator import Paginator
-from .models import Document
+from django.db.models import Avg, Value
+from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404, render, redirect
+
 from courses.models import Subject
 from payments.models import Purchase
 from reviews.models import Review
 from .forms import DocumentForm
-from django.contrib import messages
+from .models import Document
 
 
 def browse(request):
-    documents = Document.objects.filter(status="published").select_related(
-        "course", "course__subject", "seller"
-    )
+    documents = Document.objects.filter(
+        status="published"
+    ).select_related("course", "course__subject", "seller")
 
     subjects = Subject.objects.all()
 
     subject_slug = request.GET.get("subject")
     if subject_slug:
-        documents = documents.filter(course__subject__slug=subject_slug)
+        documents = documents.filter(
+            course__subject__slug=subject_slug
+        )
 
     query = request.GET.get("q")
     if query:
@@ -34,9 +39,6 @@ def browse(request):
     elif sort == "z_a":
         documents = documents.order_by("-title")
     elif sort == "top_rated":
-        from django.db.models import Avg, Value
-        from django.db.models.functions import Coalesce
-
         documents = documents.annotate(
             avg_rating=Coalesce(Avg("reviews__rating"), Value(0.0))
         ).order_by("-avg_rating")
@@ -49,12 +51,10 @@ def browse(request):
 
     purchased_ids = []
     if request.user.is_authenticated:
-        from payments.models import Purchase
-
         purchased_ids = list(
-            Purchase.objects.filter(buyer=request.user).values_list(
-                "document_id", flat=True
-            )
+            Purchase.objects.filter(
+                buyer=request.user
+            ).values_list("document_id", flat=True)
         )
 
     context = {
@@ -75,18 +75,26 @@ def document_detail(request, slug):
     Full content is only shown if the user has purchased this document.
     The purchase check is the core gating mechanism of StudyMarket.
     """
-    document = get_object_or_404(Document, slug=slug, status="published")
+    document = get_object_or_404(
+        Document, slug=slug, status="published"
+    )
 
     has_purchased = (
         request.user.is_authenticated
-        and Purchase.objects.filter(buyer=request.user, document=document).exists()
+        and Purchase.objects.filter(
+            buyer=request.user, document=document
+        ).exists()
     )
 
-    reviews = Review.objects.filter(document=document).select_related("reviewer")
+    reviews = Review.objects.filter(
+        document=document
+    ).select_related("reviewer")
 
     user_has_reviewed = (
         request.user.is_authenticated
-        and Review.objects.filter(reviewer=request.user, document=document).exists()
+        and Review.objects.filter(
+            reviewer=request.user, document=document
+        ).exists()
     )
 
     context = {
@@ -103,7 +111,9 @@ def seller_dashboard(request):
     """
     Seller dashboard — shows all documents uploaded by the logged-in user.
     """
-    documents = Document.objects.filter(seller=request.user).order_by("-created_at")
+    documents = Document.objects.filter(
+        seller=request.user
+    ).order_by("-created_at")
 
     return render(
         request,
@@ -125,7 +135,10 @@ def upload_document(request):
             document = form.save(commit=False)
             document.seller = request.user
             document.save()
-            messages.success(request, "Your document has been uploaded successfully.")
+            messages.success(
+                request,
+                "Your document has been uploaded successfully."
+            )
             return redirect("documents:seller_dashboard")
     else:
         form = DocumentForm()
@@ -141,10 +154,17 @@ def upload_document(request):
 
 @login_required
 def edit_document(request, slug):
-    document = get_object_or_404(Document, slug=slug, seller=request.user)
+    """
+    Allows sellers to edit their own documents.
+    """
+    document = get_object_or_404(
+        Document, slug=slug, seller=request.user
+    )
 
     if request.method == "POST":
-        form = DocumentForm(request.POST, request.FILES, instance=document)
+        form = DocumentForm(
+            request.POST, request.FILES, instance=document
+        )
         if form.is_valid():
             doc = form.save(commit=False)
             if not request.FILES.get("file"):
@@ -170,7 +190,9 @@ def delete_document(request, slug):
     """
     Allows sellers to delete their own documents.
     """
-    document = get_object_or_404(Document, slug=slug, seller=request.user)
+    document = get_object_or_404(
+        Document, slug=slug, seller=request.user
+    )
 
     if request.method == "POST":
         document.delete()

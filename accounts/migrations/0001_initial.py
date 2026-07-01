@@ -17,13 +17,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Profile',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_seller', models.BooleanField(default=False)),
                 ('institution', models.CharField(blank=True, max_length=150)),
                 ('bio', models.TextField(blank=True)),
-                ('avatar', models.ImageField(blank=True, null=True, upload_to='avatars/')),
+                ('avatar', models.ImageField(
+                    blank=True, null=True, upload_to='avatars/')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='profile', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ['user__username'],

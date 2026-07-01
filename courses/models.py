@@ -61,5 +61,6 @@ class Course(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.subject.name}-{self.name}-{self.level}")
+            self.slug = slugify(
+                f"{self.subject.name}-{self.name}-{self.level}")
         super().save(*args, **kwargs)

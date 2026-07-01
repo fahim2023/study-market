@@ -1,3 +1,4 @@
+from courses.models import Subject
 import stripe
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -104,9 +105,6 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
-from courses.models import Subject
-
-
 @login_required
 def my_purchases(request):
     purchases = (
@@ -120,11 +118,13 @@ def my_purchases(request):
         .order_by("-created_at")
     )
 
-    reviewed_doc_ids = list(request.user.reviews.values_list("document_id", flat=True))
+    reviewed_doc_ids = list(
+        request.user.reviews.values_list("document_id", flat=True))
 
     selected_subject = request.GET.get("subject")
     if selected_subject:
-        purchases = purchases.filter(document__course__subject__slug=selected_subject)
+        purchases = purchases.filter(
+            document__course__subject__slug=selected_subject)
 
     subjects = Subject.objects.all()
 

@@ -15,7 +15,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Subject',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('slug', models.SlugField(blank=True, max_length=110, unique=True)),
             ],
@@ -26,12 +27,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Course',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=150)),
-                ('level', models.CharField(choices=[('gcse', 'GCSE'), ('a_level', 'A-Level'), ('undergraduate', 'Undergraduate'), ('postgraduate', 'Postgraduate'), ('other', 'Other')], max_length=20)),
+                ('level', models.CharField(choices=[('gcse', 'GCSE'), ('a_level', 'A-Level'), ('undergraduate',
+                 'Undergraduate'), ('postgraduate', 'Postgraduate'), ('other', 'Other')], max_length=20)),
                 ('exam_board', models.CharField(blank=True, max_length=100)),
                 ('slug', models.SlugField(blank=True, max_length=160, unique=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='courses', to='courses.subject')),
+                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='courses', to='courses.subject')),
             ],
             options={
                 'ordering': ['subject__name', 'name'],

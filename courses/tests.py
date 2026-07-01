@@ -22,4 +22,5 @@ class SubjectModelTest(TestCase):
             name="A-Level Mathematics",
             level="a_level",
         )
-        self.assertEqual(course.slug, "mathematics-a-level-mathematics-a_level")
+        self.assertEqual(
+            course.slug, "mathematics-a-level-mathematics-a_level")

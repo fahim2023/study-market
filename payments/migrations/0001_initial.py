@@ -18,12 +18,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Purchase',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('stripe_payment_intent', models.CharField(max_length=200, unique=True)),
-                ('amount_paid', models.DecimalField(decimal_places=2, max_digits=6)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('stripe_payment_intent', models.CharField(
+                    max_length=200, unique=True)),
+                ('amount_paid', models.DecimalField(
+                    decimal_places=2, max_digits=6)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('buyer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='purchases', to=settings.AUTH_USER_MODEL)),
-                ('document', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='purchases', to='documents.document')),
+                ('buyer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='purchases', to=settings.AUTH_USER_MODEL)),
+                ('document', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='purchases', to='documents.document')),
             ],
             options={
                 'unique_together': {('buyer', 'document')},

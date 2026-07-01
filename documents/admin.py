@@ -13,7 +13,8 @@ class DocumentTagAdmin(admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ("title", "seller", "course", "price", "status", "created_at")
+    list_display = ("title", "seller", "course",
+                    "price", "status", "created_at")
     list_filter = ("status", "course__subject", "course")
     search_fields = ("title", "seller__username")
     prepopulated_fields = {"slug": ("title",)}

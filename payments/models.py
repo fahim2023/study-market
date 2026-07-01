@@ -8,7 +8,8 @@ from documents.models import Document
 
 
 class Purchase(models.Model):
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="purchases")
+    buyer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="purchases")
     document = models.ForeignKey(
         Document, on_delete=models.CASCADE, related_name="purchases"
     )

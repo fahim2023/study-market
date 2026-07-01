@@ -14,9 +14,11 @@ class ProfileSignalTest(TestCase):
     """
 
     def test_profile_created_automatically_on_user_creation(self):
-        user = User.objects.create_user(username="testbuyer", password="testpass123")
+        user = User.objects.create_user(
+            username="testbuyer", password="testpass123")
         self.assertTrue(Profile.objects.filter(user=user).exists())
 
     def test_new_profile_defaults_to_not_a_seller(self):
-        user = User.objects.create_user(username="testbuyer2", password="testpass123")
+        user = User.objects.create_user(
+            username="testbuyer2", password="testpass123")
         self.assertFalse(user.profile.is_seller)

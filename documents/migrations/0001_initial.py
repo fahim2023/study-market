@@ -18,18 +18,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Document',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200)),
                 ('slug', models.SlugField(blank=True, max_length=220, unique=True)),
                 ('description', models.TextField()),
-                ('preview_text', models.TextField(blank=True, help_text='A short teaser visible to all users before purchase.')),
+                ('preview_text', models.TextField(
+                    blank=True, help_text='A short teaser visible to all users before purchase.')),
                 ('file', models.FileField(upload_to='documents/')),
                 ('price', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('status', models.CharField(choices=[('draft', 'Draft'), ('published', 'Published')], default='draft', max_length=10)),
+                ('status', models.CharField(choices=[
+                 ('draft', 'Draft'), ('published', 'Published')], default='draft', max_length=10)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('course', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='documents', to='courses.course')),
-                ('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documents', to=settings.AUTH_USER_MODEL)),
+                ('course', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
+                 related_name='documents', to='courses.course')),
+                ('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='documents', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ['-created_at'],

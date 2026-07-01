@@ -16,7 +16,8 @@ def register(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            messages.success(request, f"Welcome to StudyMarket, {user.username}!")
+            messages.success(
+                request, f"Welcome to StudyMarket, {user.username}!")
             return redirect("documents:browse")
     else:
         form = RegisterForm()
